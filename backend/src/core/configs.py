@@ -17,6 +17,7 @@ class DatabaseConfig(BaseSettings):
 
 class Config(BaseSettings):
     debug: bool = Field(default=False)
+    cors: str = Field(default="*")
 
     database: DatabaseConfig = DatabaseConfig()
 

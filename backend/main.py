@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from src.api.v1.healtcheck import hc_router
-from src.core import connect_to_db, close_db
+from src.core import connect_to_db, close_db, config
 
 
 @asynccontextmanager
@@ -21,7 +21,7 @@ app = FastAPI(title="Moviehub_core", version="1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[config.cors.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
