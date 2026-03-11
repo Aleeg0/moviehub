@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17.8-alpine3.22
+    container_name: moviehub-db
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB}
+    ports:
+      - "${DATABASE_PORT}:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - moviehub-network
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  moviehub-core:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: moviehub-core
+    ports:
+      - "${MOVIEHUB_CORE}:8000"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - moviehub-network
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/check" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  database_data:
+
+networks:
+  moviehub-network:
+    driver: bridge
