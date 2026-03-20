@@ -1,0 +1,45 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "Confirm Password" : {
+
+    },
+    "Confirm Your Password" : {
+
+    },
+    "Email" : {
+
+    },
+    "Login" : {
+
+    },
+    "MovieMatch" : {
+
+    },
+    "Name" : {
+
+    },
+    "Password" : {
+
+    },
+    "Register" : {
+
+    },
+    "Your Email" : {
+
+    },
+    "Your Name" : {
+
+    },
+    "Your Password" : {
+
+    },
+    "Найдите кино, которое останется в сердце" : {
+
+    }
+  },
+  "version" : "1.1"
+}
