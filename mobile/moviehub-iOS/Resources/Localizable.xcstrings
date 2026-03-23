@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "(%lld seconds...)" : {
+
+    },
     "Confirm Password" : {
 
     },
@@ -11,6 +14,18 @@
 
     },
     "Email" : {
+
+    },
+    "Email is empty" : {
+
+    },
+    "Enter the 5-digit code." : {
+
+    },
+    "Enter Your Email" : {
+
+    },
+    "Forgot Password?" : {
 
     },
     "Login" : {
@@ -22,10 +37,49 @@
     "Name" : {
 
     },
+    "Name is empty" : {
+
+    },
+    "Name is too long" : {
+
+    },
+    "Name is too short" : {
+
+    },
+    "Not correct email" : {
+
+    },
     "Password" : {
 
     },
+    "Password is empty" : {
+
+    },
+    "Password is too long" : {
+
+    },
+    "Password is too short" : {
+
+    },
+    "Passwords are not equal" : {
+
+    },
     "Register" : {
+
+    },
+    "Resend Code %@" : {
+
+    },
+    "Reset Password" : {
+
+    },
+    "Send OTP" : {
+
+    },
+    "Sending Verification Code" : {
+
+    },
+    "Verification" : {
 
     },
     "Your Email" : {
