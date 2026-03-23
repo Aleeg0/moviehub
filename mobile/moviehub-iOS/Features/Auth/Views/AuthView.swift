@@ -19,6 +19,57 @@ struct AuthView: View {
     }
     
     var body: some View {
+        ZStack {
+            authView
+                .disabled(viewModel.isResetingPassword)
+                .overlay {
+                    Color.black
+                        .opacity(viewModel.isResetingPassword ? 0.5 : 0)
+                        .ignoresSafeArea()
+                }
+                .onTapGesture {
+                    if viewModel.isResetingPassword {
+                        hideKeyboard()
+                        viewModel.isResetingPassword = false
+                        viewModel.resetCode.removeAll()
+                        viewModel.resetPasswordStage = .gettingEmail
+                    }
+                }
+                .scaleEffect(viewModel.isResetingPassword ? 0.92 : 1)
+            
+            if viewModel.isResetingPassword {
+                VStack {
+                    ForgotPasswordView(viewModel: viewModel)
+                        .padding(10)
+                }
+                .offset(y: viewModel.offset)
+                .scaleEffect(1 - viewModel.offset / 800)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .gesture(
+                    DragGesture()
+                        .onChanged({ value in
+                            let transition = value.translation.height / 7
+                            if abs(transition) < 30 {
+                                viewModel.offset = transition
+                            }
+                        })
+                        .onEnded({ _ in
+                            viewModel.offset = .zero
+                        })
+                )
+                .shadow(radius: 15)
+            }
+        }
+        .animation(.bouncy, value: viewModel.offset)
+        .frame(maxHeight: .infinity)
+        .animation(.easeInOut, value: viewModel.isResetingPassword)
+        .animation(.bouncy, value: viewModel.authType)
+    }
+}
+
+private extension AuthView {
+    var authView: some View {
         VStack {
             headerView
             
@@ -27,7 +78,7 @@ struct AuthView: View {
         .offset(y: isFocused ? -30 : 0)
         .ignoresSafeArea(edges: .bottom)
         .padding(.horizontal, 20)
-        .animation(.bouncy, value: viewModel.authType)
+        .animation(.bouncy, value: viewModel.validationErrors)
     }
 }
 
@@ -40,9 +91,12 @@ private extension AuthView {
             if viewModel.authType == .register {
                 textField(text: $viewModel.model.name, field: .name)
                     .transition(.scale.combined(with: .opacity))
+                    .textContentType(.name)
             }
             
             textField(text: $viewModel.model.email, field: .email)
+                .keyboardType(.emailAddress)
+                .textContentType(.emailAddress)
             
             textField(text: $viewModel.model.password, field: .password)
             
@@ -51,8 +105,16 @@ private extension AuthView {
                     .transition(.scale.combined(with: .opacity))
             }
             
-            actionButton
-                .padding(.top, 5)
+            if viewModel.authType == .login {
+                forgotPasswordButton
+            }
+            
+            AuthActionButton(caption: viewModel.authType.actionButtonCaption) {
+                hideKeyboard()
+                viewModel.onAuth()
+            }
+            .padding(.top, 5)
+            
         }
         .padding(20)
         .background {
@@ -65,20 +127,24 @@ private extension AuthView {
         }
     }
     
-    var actionButton: some View {
-        Button(action: viewModel.onAuth) {
-            Text(viewModel.authType.actionButtonCaption)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .font(.system(size: 20, weight: .semibold))
-                .background(Capsule().foregroundStyle(authGradient))
+    var forgotPasswordButton: some View {
+        Button {
+            hideKeyboard()
+            viewModel.forgotPassword()
+        } label: {
+            Text("Forgot Password?")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(.authGradient)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .transition(.opacity.combined(with: .scale))
+                .padding(.vertical, 4)
         }
     }
+    
 }
 
 private extension AuthView {
-    func textField(text: Binding<String>, field: AuthViewModel.FieldType) -> some View {
+    func textField(text: Binding<String>, field: FieldType) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             
             Text(field.caption)
@@ -87,16 +153,20 @@ private extension AuthView {
             
             if field.isSecured {
                 SecureField("", text: text, prompt: Text(field.prompt).font(.system(size: 20, weight: .semibold)))
-                    .modifier(AuthTextFieldModifier())
+                    .modifier(AuthTextFieldModifier(error: viewModel.hasError(field: field)))
                     .focused($isFocused)
+                    .textContentType(viewModel.authType == .login ? .password : .newPassword)
             } else {
                 TextField("", text: text, prompt: Text(field.prompt).font(.system(size: 20, weight: .semibold)))
-                    .modifier(AuthTextFieldModifier())
+                    .modifier(AuthTextFieldModifier(error: viewModel.hasError(field: field)))
             }
             
-//            Text("Error: field is empty")
-//                .foregroundStyle(.red)
-//                .font(.system(size: 15, weight: .semibold))
+            if let error = viewModel.hasError(field: field) {
+                Text(error.description)
+                    .foregroundStyle(.red)
+                    .font(.system(size: 14))
+                    .transition(.opacity.combined(with: .scale))
+            }
         }
     }
 }
@@ -114,7 +184,10 @@ private extension AuthView {
     }
     
     func pickerButton(for type: AuthViewModel.AuthType) -> some View {
-        Button(action: viewModel.changeAuthType) {
+        Button {
+            hideKeyboard()
+            viewModel.changeAuthType()
+        } label: {
             Text(type.actionButtonCaption)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(type == viewModel.authType ? .white : .gray)
@@ -123,7 +196,7 @@ private extension AuthView {
                 .background {
                     if type == viewModel.authType {
                         Capsule()
-                            .foregroundStyle(authGradient)
+                            .foregroundStyle(.authGradient)
                             .matchedGeometryEffect(id: "picker", in: namespace)
                     }
                 }
@@ -139,8 +212,8 @@ private extension AuthView {
                 .font(.system(size: 40, weight: .semibold))
                 .padding(20)
                 .background(
-                    authGradient
-                        .clipShape(RoundedRectangle(cornerRadius: 23))
+                    RoundedRectangle(cornerRadius: 23)
+                        .foregroundStyle(.authGradient)
                 )
             
             Text("MovieMatch")
@@ -155,8 +228,3 @@ private extension AuthView {
     }
 }
 
-private extension AuthView {
-    var authGradient: LinearGradient {
-        .init(colors: [.authBlueTop, .authBlueDown], startPoint: .topLeading, endPoint: .bottomTrailing)
-    }
-}
