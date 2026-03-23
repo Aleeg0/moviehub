@@ -9,6 +9,6 @@ import SwiftUI
 
 struct RootView: View {
     var body: some View {
-        AuthView(viewModel: .init(service: AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager())))
+        AuthView(viewModel: .init(authService: AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager()), validator: AuthValidator()))
     }
 }
