@@ -8,6 +8,7 @@
 import Foundation
 
 struct AuthModel {
+    var emailForReset: String
     var name: String
     var email: String
     var password: String
@@ -17,6 +18,7 @@ struct AuthModel {
 extension AuthModel {
     
     init() {
+        self.emailForReset = ""
         self.name = ""
         self.email = ""
         self.confirmPassword = ""
