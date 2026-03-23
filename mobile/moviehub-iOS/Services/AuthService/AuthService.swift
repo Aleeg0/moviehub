@@ -11,6 +11,7 @@ protocol IAuthService {
     func login(model: LoginDto) async throws
     func register(model: RegisterDto) async throws
     func signOut()
+    func isLoggedIn() -> Bool
 }
 
 final class AuthService: IAuthService {
@@ -25,6 +26,13 @@ final class AuthService: IAuthService {
         self.networkManager = networkManager
         self.decoder = decoder
         self.privateStorage = privateStorage
+    }
+    
+    func isLoggedIn() -> Bool {
+        if let _: String = self.privateStorage.fetch(key: privateStorageTokenKey) {
+            return true
+        }
+        return false
     }
     
     func login(model: LoginDto) async throws {
