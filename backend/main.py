@@ -3,13 +3,17 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from src.api.v1.router import router
 from src.api.v1.healtcheck import hc_router
 from src.core import connect_to_db, close_db, config
+from src.core.database import init_db
+from src.core.errors import register_error_handlers
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await connect_to_db()
+    #TODO change to connect_db when apply migrations
+    await init_db()
 
     try:
         yield
@@ -27,4 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+register_error_handlers(app)
+
+app.include_router(router, prefix="/api")
 app.include_router(hc_router, prefix="/health")

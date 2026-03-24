@@ -2,11 +2,20 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class AuthConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix='auth')
+
+    secret_key: str = Field(default="")
+    algorithm: str = Field(default="HS256")
+    access_token_expire: int = Field(default=180)
+    refresh_token_expire: int = Field(default=1800)
+
+
 class DatabaseConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='database_')
 
     host: str = Field(default="localhost")
-    port: str = Field(default=5432)
+    port: int = Field(default=5432)
     name: str = Field(default="")
     user: str = Field(default="")
     password: str = Field(default="")
@@ -20,5 +29,6 @@ class Config(BaseSettings):
     cors: str = Field(default="*")
 
     database: DatabaseConfig = DatabaseConfig()
+    auth: AuthConfig = AuthConfig()
 
 config = Config()
