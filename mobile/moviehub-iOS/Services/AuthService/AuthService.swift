@@ -12,6 +12,10 @@ protocol IAuthService {
     func register(model: RegisterDto) async throws
     func signOut()
     func isLoggedIn() -> Bool
+    
+    func saveUserInfo(userModel: UserModel)
+    func fetchUserInfo() -> UserModel?
+    func removeUserInfo()
 }
 
 final class AuthService: IAuthService {
@@ -21,11 +25,24 @@ final class AuthService: IAuthService {
     private let privateStorage: IPrivateManager
     
     private let privateStorageTokenKey = "token"
+    private let userInfoKey = "userInfo"
     
     init(networkManager: INetworkManager, decoder: IDecodeManager, privateStorage: IPrivateManager) {
         self.networkManager = networkManager
         self.decoder = decoder
         self.privateStorage = privateStorage
+    }
+    
+    func saveUserInfo(userModel: UserModel) {
+        privateStorage.store(key: userInfoKey, object: userModel)
+    }
+    
+    func fetchUserInfo() -> UserModel? {
+        privateStorage.fetch(key: userInfoKey)
+    }
+    
+    func removeUserInfo() {
+        privateStorage.remove(key: userInfoKey)
     }
     
     func isLoggedIn() -> Bool {
