@@ -8,7 +8,14 @@
 import SwiftUI
 
 struct RootView: View {
+    let networkManager = NetworkManager()
+    let decoder = DecodeManager()
+    let privateStorage = UserDefaultsStorageManager()
+    
     var body: some View {
-        AuthView(viewModel: .init(authService: AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager()), validator: AuthValidator()))
+        
+        TabbarView(viewModel: .init())
+        //let authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
+    
     }
 }
