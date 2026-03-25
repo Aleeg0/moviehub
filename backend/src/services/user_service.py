@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.deps.auth import get_password_hash
-from src.domain.models.user import User
+from src.domain.models import User
 from src.domain.repositories import UserRepository
 from src.schemas.user import UserResponse, UserCreate
 

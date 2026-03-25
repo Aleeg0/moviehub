@@ -6,14 +6,12 @@ from starlette.middleware.cors import CORSMiddleware
 from src.api.v1.router import router
 from src.api.v1.healtcheck import hc_router
 from src.core import connect_to_db, close_db, config
-from src.core.database import init_db
 from src.core.errors import register_error_handlers
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    #TODO change to connect_db when apply migrations
-    await init_db()
+    await connect_to_db()
 
     try:
         yield

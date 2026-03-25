@@ -23,12 +23,6 @@ class Base(DeclarativeBase):
     pass
 
 
-async def init_db() -> None:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
-
 async def connect_to_db() -> None:
     async with engine.connect() as conn:
         await conn.execute(text("SELECT 1"))

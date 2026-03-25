@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.errors.errors import ResourceNotFoundError, ResourceAlreadyExistsError
-from src.domain.models.user import User
+from src.domain.models import User
 
 
 class UserRepository:
