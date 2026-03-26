@@ -6,3 +6,6 @@ class ResourceNotFoundError(ApplicationError):
 
 class ResourceAlreadyExistsError(ApplicationError):
     pass
+
+class InvalidCredentialsError(ApplicationError):
+    pass

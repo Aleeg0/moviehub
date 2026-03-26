@@ -1,20 +1,23 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from pydantic.alias_generators import to_camel
+from pydantic import EmailStr, Field
 
+from .base import BaseSchema
 
-class UserBase(BaseModel):
-    id: int
-
-    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel, validate_by_name=True)
-
-class UserCreate(BaseModel):
+class UserBase(BaseSchema):
     email: EmailStr
+
+class UserLogin(UserBase):
     password: str = Field(min_length=8, max_length=64)
-    name: str = Field(min_length=1, max_length=64)
+
+class UserRegister(UserLogin):
+    name: str = Field(min_length=1, max_length=64, json_schema_extra={"example": "John Doe"})
 
 class UserResponse(UserBase):
-    email: EmailStr
-    name: str = Field(min_length=1, max_length=64)
+    id: int
+    name: str
     created_at: datetime
+
+class UserAuthResponse(BaseSchema):
+    access_token: str
+    token_type: str = "Bearer"

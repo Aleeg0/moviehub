@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AuthConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='auth')
+    model_config = SettingsConfigDict(env_prefix='auth_')
 
     secret_key: str = Field(default="")
     algorithm: str = Field(default="HS256")

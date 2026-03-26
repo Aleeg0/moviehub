@@ -16,29 +16,3 @@ def get_password_hash(password: str) -> str:
     hashed_bytes = bcrypt.hashpw(password_bytes, salt)
 
     return hashed_bytes.decode('utf-8')
-
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(UTC) + timedelta(seconds=config.auth.access_token_expire)
-    to_encode.update({"exp": expire})
-
-    return jwt.encode(
-        to_encode,
-        config.auth.secret_key,
-        algorithm=config.auth.algorithm
-    )
-
-
-def create_reset_token(email: str) -> str:
-    expire = datetime.now(UTC) + timedelta(seconds=config.auth.reset_token_expire)
-    to_encode = {
-        "sub": email,
-        "exp": expire,
-        "type": "reset"
-    }
-
-    return jwt.encode(
-        to_encode,
-        config.auth.secret_key,
-        algorithm=config.auth.algorithm
-    )
