@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct RootView: View {
+    let networkManager = NetworkManager()
+    let decoder = DecodeManager()
+    let privateStorage = UserDefaultsStorageManager()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        
+        //TabbarView(viewModel: .init())
+        let authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
+        AuthView(viewModel: .init(authService: authService, validator: AuthValidator()))
+    
     }
 }

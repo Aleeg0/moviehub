@@ -1,0 +1,99 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "(%lld seconds...)" : {
+
+    },
+    "Confirm Password" : {
+
+    },
+    "Confirm Your Password" : {
+
+    },
+    "Email" : {
+
+    },
+    "Email is empty" : {
+
+    },
+    "Enter the 5-digit code." : {
+
+    },
+    "Enter Your Email" : {
+
+    },
+    "Forgot Password?" : {
+
+    },
+    "Login" : {
+
+    },
+    "MovieMatch" : {
+
+    },
+    "Name" : {
+
+    },
+    "Name is empty" : {
+
+    },
+    "Name is too long" : {
+
+    },
+    "Name is too short" : {
+
+    },
+    "Not correct email" : {
+
+    },
+    "Password" : {
+
+    },
+    "Password is empty" : {
+
+    },
+    "Password is too long" : {
+
+    },
+    "Password is too short" : {
+
+    },
+    "Passwords are not equal" : {
+
+    },
+    "Register" : {
+
+    },
+    "Resend Code %@" : {
+
+    },
+    "Reset Password" : {
+
+    },
+    "Send OTP" : {
+
+    },
+    "Sending Verification Code" : {
+
+    },
+    "Verification" : {
+
+    },
+    "Your Email" : {
+
+    },
+    "Your Name" : {
+
+    },
+    "Your Password" : {
+
+    },
+    "Найдите кино, которое останется в сердце" : {
+
+    }
+  },
+  "version" : "1.1"
+}
