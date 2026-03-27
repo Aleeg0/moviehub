@@ -14,8 +14,9 @@ struct RootView: View {
     
     var body: some View {
         
-        TabbarView(viewModel: .init())
-        //let authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
+        //TabbarView(viewModel: .init())
+        let authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
+        AuthView(viewModel: .init(authService: authService, validator: AuthValidator()))
     
     }
 }
