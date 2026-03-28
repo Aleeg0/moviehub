@@ -2,6 +2,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import text
+from sqlalchemy.orm import DeclarativeBase
 
 from src.core import config
 
@@ -17,6 +18,9 @@ SessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
+
+class Base(DeclarativeBase):
+    pass
 
 
 async def connect_to_db() -> None:
