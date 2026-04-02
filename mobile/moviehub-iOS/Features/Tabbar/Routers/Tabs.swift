@@ -42,10 +42,10 @@ enum Tabs: Int, CaseIterable, Identifiable, Hashable {
 extension Tabs {
     
     @ViewBuilder
-    func getView() -> some View {
+    func getView(onExit: @escaping () -> Void) -> some View {
         switch self {
         case .profile:
-            ProfileFlowView()
+            ProfileFlowView(onExit: onExit)
         case .main:
             Text("MAIN")
         case .lists:

@@ -7,35 +7,38 @@
 
 import Foundation
 
-enum RequestType {
-    case get
-    case post
-    
-    var toString: String {
-        switch self {
-        case .get:        "get"
-        case .post:       "post"
-        }
-    }
-}
-
 protocol INetworkManager {
-    func sendRequest(type: RequestType, url: String, body: Data?) async throws -> Data?
+    func sendRequest<T: IEndpoint>(endpoint: T, body: Data?) async throws(NetworkError) -> Data?
 }
 
 struct NetworkManager: INetworkManager {
-    func sendRequest(type: RequestType, url: String, body: Data?) async throws -> Data? {
-        guard let url = URL(string: url) else { return nil }
+    
+    func sendRequest<T: IEndpoint>(endpoint: T, body: Data?) async throws(NetworkError) -> Data? {
+        guard let url = endpoint.url else { return nil }
         
         var request = URLRequest(url: url)
-        request.httpMethod = type.toString
+        request.httpMethod = endpoint.httpMethod.toString
         request.httpBody = body
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else { return nil }
-        
-        return data
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else { throw NetworkError.unknown(message: "No response") }
+            
+            guard (200...300).contains(httpResponse.statusCode) else {
+                throw NetworkError.serverError(statusCode: httpResponse.statusCode)
+            }
+            
+            return data
+            
+        } catch let error as NetworkError {
+            throw error
+        }
+        catch let error {
+            print(error.localizedDescription)
+            throw .networkError(error)
+        }
     }
     
     

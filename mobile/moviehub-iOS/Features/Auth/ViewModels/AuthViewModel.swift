@@ -20,20 +20,31 @@ final class AuthViewModel: ObservableObject {
     
     @Published var emailForResetError: AuthValidationError?
     @Published var remainingTime = 30
+    @Published var authError: AuthServiceError?
+    @Published var isPresentedError: Bool = false
+    
+    private let onAuthSuccess: () -> Void
     
     private var timer: Cancellable?
     
     private let authService: IAuthService
     private let validator: IAuthValidator
+    
     private var cancellables: Set<AnyCancellable> = []
     
-    init(authService: IAuthService, validator: IAuthValidator) {
+    init(authService: IAuthService, validator: IAuthValidator, onAuthSuccess: @escaping () -> Void) {
         self.model = .init()
         self.authService = authService
         self.validator = validator
+        self.onAuthSuccess = onAuthSuccess
         
         self._resetCode.projectedValue.sink { code in
             self.updateResetState(resetCode: code)
+        }
+        .store(in: &cancellables)
+        
+        self._authError.projectedValue.compactMap({ $0 }).sink { _ in
+            self.isPresentedError = true
         }
         .store(in: &cancellables)
 
@@ -164,10 +175,41 @@ final class AuthViewModel: ObservableObject {
     
     private func login() {
         validateLogin()
+        
+        if validationErrors.isEmpty {
+            Task {
+                do {
+                    try await authService.login(model: model)
+                    await MainActor.run {
+                        onAuthSuccess()
+                    }
+                } catch let error {
+                    await MainActor.run {
+                        self.authError = error as? AuthServiceError ?? AuthServiceError.loginError(.unknown(message: "Login error occured"))
+                    }
+                }
+            }
+        }
+        
     }
     
     private func register() {
         validateRegister()
+        
+        if validationErrors.isEmpty {
+            Task {
+                do {
+                    try await authService.register(model: model)
+                    await MainActor.run {
+                        onAuthSuccess()
+                    }
+                } catch let error {
+                    await MainActor.run {
+                        self.authError = error as? AuthServiceError ?? AuthServiceError.registerError(.unknown(message: "Register error occured"))
+                    }
+                }
+            }
+        }
     }
     
 }

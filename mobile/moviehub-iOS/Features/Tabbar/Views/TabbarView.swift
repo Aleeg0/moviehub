@@ -22,7 +22,7 @@ struct TabbarView: View {
     var body: some View {
         TabView(selection: $viewModel.selectedTab) {
             ForEach(Tabs.allCases) { tab in
-                tab.getView()
+                tab.getView(onExit: viewModel.onExit)
                     .tabItem {
                         Label(tab.caption, systemImage: tab.image)
                     }

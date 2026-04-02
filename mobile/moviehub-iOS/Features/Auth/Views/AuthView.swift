@@ -65,6 +65,8 @@ struct AuthView: View {
         .frame(maxHeight: .infinity)
         .animation(.easeInOut, value: viewModel.isResetingPassword)
         .animation(.bouncy, value: viewModel.authType)
+        .animation(.bouncy, value: viewModel.authError)
+
     }
 }
 
@@ -105,15 +107,24 @@ private extension AuthView {
                     .transition(.scale.combined(with: .opacity))
             }
             
-            if viewModel.authType == .login {
-                forgotPasswordButton
+            VStack(spacing: 2) {
+                if viewModel.authType == .login {
+                    forgotPasswordButton
+                }
+                
+                
+                if let error = viewModel.authError {
+                    Text(error.description)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.red)
+                        .transition(.opacity.combined(with: .scale))
+                }
             }
             
             AuthActionButton(caption: viewModel.authType.actionButtonCaption) {
                 hideKeyboard()
                 viewModel.onAuth()
             }
-            .padding(.top, 5)
             
         }
         .padding(20)
@@ -219,7 +230,7 @@ private extension AuthView {
             Text("MovieMatch")
                 .font(.system(size: 29, weight: .semibold))
             
-            Text("Найдите кино, которое останется в сердце")
+            Text("Discover a film that will dwell in your heart forever.")
                 .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(.gray)
                 .multilineTextAlignment(.center)

@@ -90,7 +90,7 @@ struct ProfileView: View {
                 .font(.system(size: 24))
                 .foregroundStyle(.authBlueTop)
             
-            Text("Achievements")
+            Text("Достижения")
                 .font(.system(size: 24, weight: .semibold))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -152,10 +152,10 @@ struct ProfileView: View {
             avatarView
             
             VStack(alignment: .leading, spacing: 10) {
-                Text(viewModel.userModel?.name ?? "Username")
+                Text(viewModel.userModel?.name ?? "Имя пользователя")
                     .font(.system(size: 25, weight: .semibold))
                 
-                Text(viewModel.userModel?.email ?? "Email")
+                Text(viewModel.userModel?.email ?? "Почта")
                     .font(.system(size: 19, weight: .regular))
                     .foregroundStyle(.gray)
             }

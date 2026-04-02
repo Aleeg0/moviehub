@@ -8,8 +8,8 @@
 import Foundation
 
 protocol IAuthService {
-    func login(model: LoginDto) async throws
-    func register(model: RegisterDto) async throws
+    func login(model: AuthModel) async throws(AuthServiceError)
+    func register(model: AuthModel) async throws(AuthServiceError)
     func signOut()
     func isLoggedIn() -> Bool
     
@@ -52,25 +52,57 @@ final class AuthService: IAuthService {
         return false
     }
     
-    func login(model: LoginDto) async throws {
-        let body: Data? = decoder.encode(data: model)
+    func login(model: AuthModel) async throws(AuthServiceError) {
         
-        guard let data = try await networkManager.sendRequest(type: .post, url: "path", body: body) else { throw NSError() }
+        let loginRequestDTO: LoginRequestDTO = .init(email: model.email, password: model.password)
+        let body: Data? = decoder.encode(data: loginRequestDTO)
+        let endpoint: AuthEndpoints = .login
         
-        let token: String = decoder.decode(data: data)
+        let data: Data
         
-        privateStorage.store(key: privateStorageTokenKey, object: token)
+        do {
+            guard let result = try await networkManager.sendRequest(endpoint: endpoint, body: body) else { throw NetworkError.unknown(message: "Unknown error occured") }
+            
+            data = result
+        } catch let error {
+            throw .loginError(error as? NetworkError ?? .unknown(message: "Unknown error occured"))
+        }
         
+        if let response: AuthResponseDTO = decoder.decode(data: data) {
+            privateStorage.store(key: privateStorageTokenKey, object: response.accessToken)
+        }
+        else if let error: ErrorAuthResponseDTO = decoder.decode(data: data) {
+            throw .loginError(.unknown(message: "\(error.detail.first?.msg ?? "Error")"))
+        }
+        else {
+            throw .loginError(.unknown(message: "Unknown error occured"))
+        }
     }
     
-    func register(model: RegisterDto) async throws {
-        let body: Data? = decoder.encode(data: model)
+    func register(model: AuthModel) async throws(AuthServiceError) {
+        let registerRequestDTO: RegisterRequestDTO = .init(email: model.email, password: model.password, name: model.name)
+        let body: Data? = decoder.encode(data: registerRequestDTO)
+        let endpoint: AuthEndpoints = .register
         
-        guard let data = try await networkManager.sendRequest(type: .post, url: "path", body: body) else { throw NSError() }
+        let data: Data
         
-        let token: String = decoder.decode(data: data)
+        do {
+            guard let result = try await networkManager.sendRequest(endpoint: endpoint, body: body) else { throw NetworkError.unknown(message: "Unknown error occured") }
+            
+            data = result
+        } catch let error {
+            throw .registerError(error as? NetworkError ?? .unknown(message: "Unknown error occured"))
+        }
         
-        privateStorage.store(key: privateStorageTokenKey, object: token)
+        if let response: AuthResponseDTO = decoder.decode(data: data) {
+            privateStorage.store(key: privateStorageTokenKey, object: response.accessToken)
+        }
+        else if let error: ErrorAuthResponseDTO = decoder.decode(data: data) {
+            throw .registerError(.unknown(message: "\(error.detail.first?.msg ?? "Error")"))
+        }
+        else {
+            throw .registerError(.unknown(message: "Unknown error occured"))
+        }
     }
     
     func signOut() {

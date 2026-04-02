@@ -94,7 +94,7 @@ final class AuthValidator: IAuthValidator {
         if password.isEmpty {
             errors.append(AuthValidationError.passwordError(.empty, type))
         }
-        else if password.count < 3 {
+        else if password.count < 8 {
             errors.append(AuthValidationError.passwordError(.tooShort, type))
         }
         if password.count > 20 {

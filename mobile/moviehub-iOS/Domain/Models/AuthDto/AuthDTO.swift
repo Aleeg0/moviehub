@@ -8,13 +8,13 @@
 import Foundation
 
 
-struct LoginDto: Codable {
-    let email: String
-    let password: String
-}
-
-struct RegisterDto: Codable {
-    let name: String
-    let email: String
-    let password: String
-}
+//struct LoginDto: Codable {
+//    let email: String
+//    let password: String
+//}
+//
+//struct RegisterDto: Codable {
+//    let name: String
+//    let email: String
+//    let password: String
+//}

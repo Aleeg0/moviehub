@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct moviehub_iOSApp: App {
+    private let authService: IAuthService = AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager())
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootView(viewModel: .init(authService: authService))
         }
     }
 }

@@ -12,11 +12,24 @@ struct RootView: View {
     let decoder = DecodeManager()
     let privateStorage = UserDefaultsStorageManager()
     
-    var body: some View {
-        
-        //TabbarView(viewModel: .init())
-        let authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
-        AuthView(viewModel: .init(authService: authService, validator: AuthValidator()))
     
+    @ObservedObject private var viewModel: RootViewModel
+    
+    init(viewModel: RootViewModel) {
+        self.viewModel = viewModel
+    }
+    
+    var body: some View {
+        ZStack {
+            if viewModel.isSigned {
+                TabbarView(viewModel: .init(onExit: viewModel.onExit))
+                    .transition(.opacity.combined(with: .scale))
+            } else {
+                let authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
+                AuthView(viewModel: .init(authService: authService, validator: AuthValidator(), onAuthSuccess: viewModel.onAuth))
+                    .transition(.opacity.combined(with: .scale))
+            }
+        }
+        .animation(.easeInOut, value: viewModel.isSigned)
     }
 }
