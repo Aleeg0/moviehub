@@ -10,4 +10,10 @@ import Combine
 
 final class TabViewModel: ObservableObject {
     @Published var selectedTab: Tabs = .profile
+    
+    let onExit: () -> Void
+    
+    init(onExit: @escaping () -> Void) {
+        self.onExit = onExit
+    }
 }

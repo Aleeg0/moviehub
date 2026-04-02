@@ -9,9 +9,15 @@ import Foundation
 import SwiftUI
 
 struct ProfileFlowView: View {
+    private let onExit: () -> Void
+    
+    init(onExit: @escaping () -> Void) {
+        self.onExit = onExit
+    }
+    
     var body: some View {
         NavigationStack {
-            ProfileView(viewModel: .init(authService: AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager())))
+            ProfileView(viewModel: .init(authService: AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager()), onExit: onExit))
         }
     }
 }

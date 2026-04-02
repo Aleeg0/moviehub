@@ -7,10 +7,25 @@
     "(%lld seconds...)" : {
 
     },
+    "%@" : {
+
+    },
+    "0" : {
+
+    },
+    "5 звезд" : {
+
+    },
+    "5 фильмов" : {
+
+    },
     "Confirm Password" : {
 
     },
     "Confirm Your Password" : {
+
+    },
+    "Discover a film that will dwell in your heart forever." : {
 
     },
     "Email" : {
@@ -25,10 +40,28 @@
     "Enter Your Email" : {
 
     },
+    "Error: %@" : {
+
+    },
     "Forgot Password?" : {
 
     },
+    "Lists" : {
+
+    },
+    "LISTS" : {
+
+    },
     "Login" : {
+
+    },
+    "Login error occured" : {
+
+    },
+    "Main" : {
+
+    },
+    "MAIN" : {
 
     },
     "MovieMatch" : {
@@ -44,6 +77,9 @@
 
     },
     "Name is too short" : {
+
+    },
+    "No response" : {
 
     },
     "Not correct email" : {
@@ -64,7 +100,13 @@
     "Passwords are not equal" : {
 
     },
+    "Profile" : {
+
+    },
     "Register" : {
+
+    },
+    "Register error occured" : {
 
     },
     "Resend Code %@" : {
@@ -79,6 +121,15 @@
     "Sending Verification Code" : {
 
     },
+    "Server error code %lld" : {
+
+    },
+    "Unknown error occured" : {
+
+    },
+    "User not found" : {
+
+    },
     "Verification" : {
 
     },
@@ -91,7 +142,22 @@
     "Your Password" : {
 
     },
-    "Найдите кино, которое останется в сердце" : {
+    "Достижения" : {
+
+    },
+    "Первая заметка" : {
+
+    },
+    "Первый фильм" : {
+
+    },
+    "Просмотрено" : {
+
+    },
+    "Средняя" : {
+
+    },
+    "Хочу" : {
 
     }
   },

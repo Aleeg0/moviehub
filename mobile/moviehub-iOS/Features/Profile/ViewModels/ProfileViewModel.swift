@@ -15,16 +15,19 @@ final class ProfileViewModel: ObservableObject {
     
     // MARK: - Services
     private let authService: IAuthService
+    private let onExit: () -> Void
     
     // MARK: - Init
-    init(authService: IAuthService) {
+    init(authService: IAuthService, onExit: @escaping () -> Void) {
         self.authService = authService
+        self.onExit = onExit
         
         self.userModel = authService.fetchUserInfo()
     }
     
     func signOut() {
         self.authService.signOut()
+        self.onExit()
     }
     
     var nameFirstLetter: String {
