@@ -1,11 +1,12 @@
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, Response, Cookie
+from fastapi.responses import FileResponse
 
-from src.api.v1.dep import get_user_service
+from src.api.v1.dep import get_user_service, get_pdf_service
 from src.core import config
 from src.schemas.user import UserLogin, UserAuthResponse, UserRegister
-from src.services import UserService
+from src.services import UserService, PdfService
 
 router = APIRouter(prefix="/users")
 
@@ -46,3 +47,12 @@ async def logout(
 @router.delete("/{user_id}", response_model=None, status_code=HTTPStatus.NO_CONTENT)
 async def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
     return await service.delete(user_id)
+
+@router.get("/agreement", response_class=FileResponse)
+async def get_agreement(service: PdfService = Depends(get_pdf_service)):
+    return FileResponse(
+        path=service.get_agreement_path(),
+        media_type="application/pdf",
+        filename="user_agreement.pdf",
+        headers={"Cache-Control": f"public, max-age={config.pdf.cache_max_age}"}
+    )
