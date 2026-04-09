@@ -2,7 +2,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core import get_db
-from src.services import UserService, AuthService, MailService
+from src.services import UserService, AuthService, MailService, PdfService
 
 
 def get_auth_service(session: AsyncSession = Depends(get_db)) ->AuthService:
@@ -21,3 +21,6 @@ def get_user_service(
         auth_service=auth_service,
         mail_service=mail_service
     )
+
+def get_pdf_service() -> PdfService:
+    return PdfService()
