@@ -28,6 +28,12 @@
     "Discover a film that will dwell in your heart forever." : {
 
     },
+    "Dont want" : {
+
+    },
+    "DONT WANT" : {
+
+    },
     "Email" : {
 
     },
@@ -77,6 +83,9 @@
 
     },
     "Name is too short" : {
+
+    },
+    "No Image" : {
 
     },
     "No response" : {
@@ -131,6 +140,18 @@
 
     },
     "Verification" : {
+
+    },
+    "Want" : {
+
+    },
+    "WANT" : {
+
+    },
+    "Watched" : {
+
+    },
+    "WATCHED" : {
 
     },
     "Your Email" : {

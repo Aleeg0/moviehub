@@ -61,7 +61,7 @@ final class AuthService: IAuthService {
         let data: Data
         
         do {
-            guard let result = try await networkManager.sendRequest(endpoint: endpoint, body: body) else { throw NetworkError.unknown(message: "Unknown error occured") }
+            guard let result = try await networkManager.sendRequest(endpoint: endpoint, body: body, authorization: nil) else { throw NetworkError.unknown(message: "Unknown error occured") }
             
             data = result
         } catch let error {
@@ -87,7 +87,7 @@ final class AuthService: IAuthService {
         let data: Data
         
         do {
-            guard let result = try await networkManager.sendRequest(endpoint: endpoint, body: body) else { throw NetworkError.unknown(message: "Unknown error occured") }
+            guard let result = try await networkManager.sendRequest(endpoint: endpoint, body: body, authorization: nil) else { throw NetworkError.unknown(message: "Unknown error occured") }
             
             data = result
         } catch let error {

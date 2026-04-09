@@ -14,9 +14,21 @@ protocol IDecodeManager {
 
 struct DecodeManager: IDecodeManager {
     
+    private let decoder: JSONDecoder
+    
+    init() {
+        let decoder = JSONDecoder()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        decoder.dateDecodingStrategy = .formatted(formatter)
+        
+        self.decoder = decoder
+    }
+    
+    
     func decode<T: Decodable>(data: Data) -> T? {
         do {
-            return try? JSONDecoder().decode(T.self, from: data)
+            return try? decoder.decode(T.self, from: data)
         } catch let error {
             
         }

@@ -12,7 +12,8 @@ struct moviehub_iOSApp: App {
     private let authService: IAuthService = AuthService(networkManager: NetworkManager(), decoder: DecodeManager(), privateStorage: UserDefaultsStorageManager())
     var body: some Scene {
         WindowGroup {
-            RootView(viewModel: .init(authService: authService))
+            FilmStackView()
+            //RootView(viewModel: .init(authService: authService))
         }
     }
 }
