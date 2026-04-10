@@ -19,16 +19,14 @@ class AuthService:
 
         return TokensResponse(access_token=access_token, refresh_token=refresh_token)
 
-    async def validate_token(self, token: str) -> int | None:
-        print(token)
+    async def validate_refresh_token(self, token: str) -> int | None:
         try:
             payload = jwt.decode(
                 token,
                 config.auth.secret_key,
                 algorithms=[config.auth.algorithm]
             )
-        except JWTError as e:
-            print(f'JWT Error details: {e}')
+        except JWTError:
             return None
 
         if payload.get("type") != "refresh":
@@ -48,12 +46,36 @@ class AuthService:
 
         return int(user_id)
 
+
+    async def validate_access_token(self, token: str) -> int | None:
+        try:
+            payload = jwt.decode(
+                token,
+                config.auth.secret_key,
+                algorithms=[config.auth.algorithm]
+            )
+        except JWTError:
+            return None
+
+        if payload.get("type") != "access":
+            return None
+
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+
+        return int(user_id)
+
+
     async def revoke_token(self, user_id: int) -> None:
         result = await self.session.execute(
             select(RefreshToken).where(RefreshToken.user_id == user_id)
         )
 
         refresh_token = result.scalar_one_or_none()
+
+        if refresh_token is None:
+            return
 
         await self.session.delete(refresh_token)
         await self.session.commit()

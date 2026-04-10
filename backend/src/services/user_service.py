@@ -6,11 +6,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.enums import RedisKeys
-from src.core.errors import ResourceAlreadyExistsError, InvalidCredentialsError, ResourceNotFoundError
+from src.core.errors import ResourceAlreadyExistsError, InvalidCredentialsError, ResourceNotFoundError, \
+    UnauthorizedError
 from src.deps.auth import get_password_hash, verify_password
 from src.domain.models import User
 from src.schemas.auth import TokensResponse
-from src.schemas.user import UserLogin, UserRegister, UserVerifyResetCode, ResetPasswordToken, UserBase, ResetPassword
+from src.schemas.user import UserLogin, UserRegister, UserVerifyResetCode, ResetPasswordToken, UserBase, ResetPassword, \
+    LogoutRequest, RefreshRequest
 from .auth_service import AuthService
 from .mail_service import MailService
 
@@ -71,12 +73,22 @@ class UserService:
         return tokens
 
 
-    async def logout(self, refresh_token: str) -> None:
-        user_id = await self.auth_service.validate_token(refresh_token)
+    async def logout(self, payload: LogoutRequest) -> None:
+        user_id = await self.auth_service.validate_access_token(payload.access_token)
         if not user_id:
-            raise ResourceNotFoundError("Incorrect refresh token")
+            raise UnauthorizedError("User unauthorized")
 
         await self.auth_service.revoke_token(user_id)
+
+    async def refresh(self, payload: RefreshRequest) -> TokensResponse:
+        user_id = await self.auth_service.validate_refresh_token(payload.refresh_token)
+        if not user_id:
+            raise UnauthorizedError("User unauthorized")
+
+        tokens = self.auth_service.generate_tokens(user_id)
+        await self.auth_service.save_token(user_id, tokens.refresh_token)
+
+        return tokens
 
 
     async def send_reset_mail(self, payload: UserBase) -> None:
@@ -87,7 +99,6 @@ class UserService:
             raise ResourceNotFoundError("User with email does not exist")
 
         reset_code = "".join(str(secrets.randbelow(10)) for _ in range(5))
-        print(reset_code)
 
         await self.mail_service.send_reset_mail(user.email, reset_code)
 
@@ -110,7 +121,6 @@ class UserService:
         await self.redis.delete(reset_code_key)
 
         reset_token = secrets.token_urlsafe(32)
-        print(reset_token)
 
         await self.redis.set(
             name=RedisKeys.USER_RESET_TOKEN.format(email=payload.email),

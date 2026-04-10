@@ -19,9 +19,14 @@ class UserResponse(UserBase):
     name: str
     created_at: datetime
 
+class LogoutRequest(BaseSchema):
+    access_token: str
+
+class RefreshRequest(BaseSchema):
+    refresh_token: str
+
 class UserAuthResponse(BaseSchema):
     access_token: str
-    token_type: str = "Bearer"
 
 class UserResetPassword(UserBase):
     pass

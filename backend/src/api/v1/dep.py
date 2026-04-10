@@ -1,4 +1,5 @@
 from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_mail import FastMail
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core import get_db, get_mail, get_redis
 from src.services import UserService, AuthService, MailService, PdfService
 
+security = HTTPBearer()
+
+def get_access_token(auth: HTTPAuthorizationCredentials = Depends(security)):
+    return auth.credentials
 
 def get_auth_service(session: AsyncSession = Depends(get_db)) ->AuthService:
     return AuthService(session=session)
