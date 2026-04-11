@@ -19,10 +19,19 @@
     "5 фильмов" : {
 
     },
+    "Change password" : {
+
+    },
     "Confirm Password" : {
 
     },
+    "Confirm Your New Password" : {
+
+    },
     "Confirm Your Password" : {
+
+    },
+    "Continue" : {
 
     },
     "Discover a film that will dwell in your heart forever." : {
@@ -40,16 +49,25 @@
     "Email is empty" : {
 
     },
+    "Enter new password" : {
+
+    },
     "Enter the 5-digit code." : {
 
     },
-    "Enter Your Email" : {
+    "Enter your email." : {
+
+    },
+    "Enter Your New Password" : {
 
     },
     "Error: %@" : {
 
     },
     "Forgot Password?" : {
+
+    },
+    "I agree to the [Terms and Privacy Policy](http://localhost:8000/api/v1/users/agreement)." : {
 
     },
     "Lists" : {
@@ -65,9 +83,6 @@
 
     },
     "Main" : {
-
-    },
-    "MAIN" : {
 
     },
     "MovieMatch" : {
@@ -121,10 +136,10 @@
     "Resend Code %@" : {
 
     },
-    "Reset Password" : {
+    "Reset password" : {
 
     },
-    "Send OTP" : {
+    "Send code" : {
 
     },
     "Sending Verification Code" : {
@@ -133,7 +148,13 @@
     "Server error code %lld" : {
 
     },
+    "Unknown" : {
+
+    },
     "Unknown error occured" : {
+
+    },
+    "User already exists" : {
 
     },
     "User not found" : {
@@ -152,6 +173,9 @@
 
     },
     "WATCHED" : {
+
+    },
+    "You have changed password successfully" : {
 
     },
     "Your Email" : {

@@ -107,6 +107,10 @@ private extension AuthView {
                     .transition(.scale.combined(with: .opacity))
             }
             
+            if viewModel.authType == .register {
+                checkboxView
+            }
+            
             VStack(spacing: 2) {
                 if viewModel.authType == .login {
                     forgotPasswordButton
@@ -138,6 +142,39 @@ private extension AuthView {
         }
     }
     
+}
+
+private extension AuthView {
+    var checkboxView: some View {
+        HStack {
+            Button(action: viewModel.onAgreeChange) {
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.authBlueTop, lineWidth: 1)
+                    .frame(width: 25, height: 25)
+                    .overlay {
+                        if viewModel.isAgree {
+                            Image(systemName: "checkmark")
+                                .fontWeight(.semibold)
+                                .frame(width: 15, height: 15)
+                                .foregroundStyle(.authBlueTop)
+                        }
+                    }
+            }
+            
+            Text("I agree to the [Terms and Privacy Policy](http://localhost:8000/api/v1/users/agreement).")
+                .font(.system(size: 15, weight: .regular))
+                .tint(.blue)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(viewModel.isAgreeError ? .red : .white)
+
+        }
+        .animation(.easeInOut, value: viewModel.isAgree)
+    }
+}
+
+private extension AuthView {
     var forgotPasswordButton: some View {
         Button {
             hideKeyboard()
@@ -151,7 +188,6 @@ private extension AuthView {
                 .padding(.vertical, 4)
         }
     }
-    
 }
 
 private extension AuthView {

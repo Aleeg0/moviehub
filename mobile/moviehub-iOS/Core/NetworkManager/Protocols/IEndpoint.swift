@@ -18,6 +18,7 @@ enum HttpMethod {
     case post
     case put
     case delete
+    case patch
     
     var toString: String {
         switch self {
@@ -25,6 +26,7 @@ enum HttpMethod {
         case .post:       "POST"
         case .put:        "PUT"
         case .delete:     "DELETE"
+        case .patch:      "PATCH"
         }
     }
 }
