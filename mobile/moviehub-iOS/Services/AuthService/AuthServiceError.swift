@@ -18,6 +18,7 @@ enum AuthServiceError: Error, Equatable {
     
     case loginError(NetworkError)
     case registerError(NetworkError)
+    case resetPasswordError(NetworkError)
     case unknown
     
     var description: LocalizedStringResource {
@@ -32,9 +33,25 @@ enum AuthServiceError: Error, Equatable {
                 networkError.description
             }
         case .registerError(let networkError):
-            networkError.description
+            switch networkError {
+            case .serverError(let statusCode):
+                statusCode == 400 ? "User already exists" : networkError.description
+            case .networkError:
+                networkError.description
+            case .unknown:
+                networkError.description
+            }
         case .unknown:
             "Unknown error occured"
+        case .resetPasswordError(let networkError):
+            switch networkError {
+            case .serverError(let statusCode):
+                statusCode == 404 ? "User not found" : networkError.description
+            case .networkError:
+                networkError.description
+            case .unknown:
+                networkError.description
+            }
         }
     }
 }

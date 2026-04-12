@@ -12,6 +12,9 @@ protocol IAuthService {
     func register(model: AuthModel) async throws(AuthServiceError)
     func signOut()
     func isLoggedIn() -> Bool
+    func askResetCode(email: String) async throws(AuthServiceError)
+    func verifyCode(email: String, code: String) async throws(AuthServiceError) -> String
+    func resetPassword(email: String, password: String) async throws(AuthServiceError)
     
     func saveUserInfo(userModel: UserModel)
     func fetchUserInfo() -> UserModel?
@@ -25,12 +28,64 @@ final class AuthService: IAuthService {
     private let privateStorage: IPrivateManager
     
     private let privateStorageTokenKey = "token"
+    private let resetTokenKey = "resetToken"
     private let userInfoKey = "userInfo"
     
     init(networkManager: INetworkManager, decoder: IDecodeManager, privateStorage: IPrivateManager) {
         self.networkManager = networkManager
         self.decoder = decoder
         self.privateStorage = privateStorage
+    }
+    
+    func resetPassword(email: String, password: String) async throws(AuthServiceError) {
+        
+        let resetCodeDto: ResetCodeDTO = .init(
+            resetToken: privateStorage.fetch(key: resetTokenKey) ?? "",
+            email: email,
+            newPassword: password
+        )
+        
+        let body: Data? = decoder.encode(data: resetCodeDto)
+        
+        do {
+           try await networkManager.sendRequest(endpoint: AuthEndpoints.resetPassword, body: body, authorization: nil)
+        } catch let error {
+            throw .resetPasswordError(error)
+        }
+        
+    }
+    
+    func verifyCode(email: String, code: String) async throws(AuthServiceError) -> String {
+        
+        let verifyDTO: VerifyCodeDTO = .init(email: email, code: code)
+        let body: Data? = decoder.encode(data: verifyDTO)
+        
+        do {
+            guard let data = try await networkManager.sendRequest(endpoint: AuthEndpoints.verifyCode, body: body, authorization: nil) else { throw NetworkError.unknown(message: "Unknown") }
+            
+            guard let response: VerifyCodeResponseDTO = decoder.decode(data: data) else { throw NSError() }
+            
+            privateStorage.store(key: resetTokenKey, object: response.resetToken)
+            
+            return response.resetToken
+            
+        } catch let error as NetworkError {
+            throw .loginError(error)
+        } catch let error {
+            throw .unknown
+        }
+    }
+    
+    func askResetCode(email: String) async throws(AuthServiceError) {
+        
+        let resetDTO = AskResetDTO(email: email)
+        let body: Data? = decoder.encode(data: resetDTO)
+        
+        do {
+            try await networkManager.sendRequest(endpoint: AuthEndpoints.askResetCode, body: body, authorization: nil)
+        } catch let error {
+            throw .resetPasswordError(error)
+        }
     }
     
     func saveUserInfo(userModel: UserModel) {

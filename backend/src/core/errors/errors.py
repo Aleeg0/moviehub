@@ -9,3 +9,6 @@ class ResourceAlreadyExistsError(ApplicationError):
 
 class InvalidCredentialsError(ApplicationError):
     pass
+
+class UnauthorizedError(ApplicationError):
+    pass

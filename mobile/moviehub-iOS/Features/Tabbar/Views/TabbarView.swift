@@ -20,7 +20,7 @@ struct TabbarView: View {
     
     // MARK: - Body
     var body: some View {
-        TabView(selection: $viewModel.selectedTab) {
+        TabView {
             ForEach(Tabs.allCases) { tab in
                 tab.getView(onExit: viewModel.onExit)
                     .tabItem {

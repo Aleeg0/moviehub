@@ -17,6 +17,14 @@ final class AuthViewModel: ObservableObject {
     @Published var resetPasswordStage: ResetPasswordStage = .gettingEmail
     @Published var resetCode: String = ""
     @Published var offset: CGFloat = .zero
+    @Published var newPassword: String = ""
+    @Published var confirmNewPassword: String = ""
+    
+    @Published var isAgree = false
+    @Published var isAgreeError = false
+    
+    @Published var resetPasswordValidationError: [IAuthValidationError] = []
+    @Published var resetPasswordError: AuthServiceError?
     
     @Published var emailForResetError: AuthValidationError?
     @Published var remainingTime = 30
@@ -58,6 +66,10 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
+    func onAgreeChange() {
+        self.isAgree.toggle()
+    }
+    
     private func timerStart() {
         self.remainingTime = 30
         self.timer?.cancel()
@@ -76,6 +88,7 @@ final class AuthViewModel: ObservableObject {
     
     func resendCode() {
         timerStart()
+        sendCode()
     }
     
     private func updateResetState(resetCode: String) {
@@ -84,15 +97,32 @@ final class AuthViewModel: ObservableObject {
         
         if resetCode.count < 5 {
             self.resetPasswordStage = .enterCode(.inProgress(index: resetCode.count - 1))
-        } else if resetCode == "12345" {
-            self.resetPasswordStage = .enterCode(.success)
         } else {
-            self.resetPasswordStage = .enterCode(.error)
+            Task {
+                do {
+                    try await authService.verifyCode(email: model.emailForReset, code: resetCode)
+                    
+                    await MainActor.run {
+                        self.resetPasswordStage = .enterCode(.success)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.resetPasswordStage = .enterNewPassword
+                        }
+                    }
+                } catch let error {
+                    await MainActor.run {
+                        self.resetPasswordStage = .enterCode(.error)
+                    }
+                }
+            }
         }
     }
     
     func changeAuthType() {
+        
+        self.authError = nil
         self.validationErrors = []
+        self.isAgreeError = false
+        
         switch authType {
         case .login:         authType = .register
         case .register:      authType = .login
@@ -136,14 +166,76 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
+    func resetPassword() {
+        
+        self.resetPasswordError = nil
+        
+        self.resetPasswordValidationError = validatePasswords(password: newPassword, passwordWith: confirmNewPassword)
+        
+        guard resetPasswordValidationError.isEmpty else { return }
+        
+        Task {
+            do {
+                try await authService.resetPassword(email: model.emailForReset, password: newPassword)
+                
+                await MainActor.run {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.resetPasswordStage = .success
+                    }
+                }
+            } catch let error as AuthServiceError {
+                await MainActor.run {
+                    self.resetPasswordError = error
+                }
+            }
+        }
+    }
+    
+    func onResetPasswordEnd() {
+        self.isResetingPassword = false
+        self.resetPasswordStage = .gettingEmail
+        self.model.emailForReset = ""
+        self.resetCode = ""
+        self.newPassword = ""
+        self.confirmNewPassword = ""
+    }
+    
     func onOTPSend() {
         self.emailForResetError = checkEmail(email: model.emailForReset)
+        
+        self.resetPasswordError = nil
         guard self.emailForResetError == nil else { return }
+        
         self.resetPasswordStage = .loadingOTP
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.resetPasswordStage = .enterCode(.inProgress(index: 0))
-            self.timerStart()
+            self.sendCode()
         }
+    }
+    
+    private func sendCode() {
+        Task {
+            do {
+                try await authService.askResetCode(email: model.emailForReset)
+                
+                await MainActor.run {
+                    self.resetPasswordStage = .enterCode(.inProgress(index: 0))
+                    self.resetCode = ""
+                    self.timerStart()
+                }
+                
+            } catch let error as AuthServiceError {
+                await MainActor.run {
+                    self.resetPasswordStage = .gettingEmail
+                    self.resetPasswordError = error
+                }
+            }
+        }
+
+    }
+    
+    func validatePasswords(password: String, passwordWith: String) -> [IAuthValidationError] {
+        (validator.checkPassword(password: password, type: .password) + validator.checkPassword(password: passwordWith, type: .confirmPassword) + validator.checkPasswordsMatch(password: password, confirmPassword: passwordWith))
     }
     
     func checkEmail(email: String) -> AuthValidationError? {
@@ -196,6 +288,13 @@ final class AuthViewModel: ObservableObject {
     private func register() {
         validateRegister()
         
+        if !isAgree {
+            isAgreeError = true
+            return
+        } else {
+            isAgreeError = false
+        }
+        
         if validationErrors.isEmpty {
             Task {
                 do {
@@ -220,6 +319,8 @@ extension AuthViewModel {
         case gettingEmail
         case loadingOTP
         case enterCode(EnterCodeState)
+        case enterNewPassword
+        case success
         
         enum EnterCodeState: Equatable {
             case error
