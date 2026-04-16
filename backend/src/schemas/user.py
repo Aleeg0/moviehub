@@ -20,7 +20,7 @@ class UserResponse(UserBase):
     created_at: datetime
 
 class LogoutRequest(BaseSchema):
-    access_token: str
+    user_id: int
 
 class RefreshRequest(BaseSchema):
     refresh_token: str

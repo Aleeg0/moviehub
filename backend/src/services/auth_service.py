@@ -1,5 +1,6 @@
 from datetime import datetime, UTC, timedelta
 
+import bcrypt
 from jose import jwt, JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -97,6 +98,21 @@ class AuthService:
             refresh_token.token = token
 
         await self.session.commit()
+
+    @staticmethod
+    def verify_password(plain_password: str, hashed_password: str) -> bool:
+        password_bytes = plain_password.encode('utf-8')
+        hash_bytes = hashed_password.encode('utf-8')
+
+        return bcrypt.checkpw(password_bytes, hash_bytes)
+
+    @staticmethod
+    def get_password_hash(password: str) -> str:
+        password_bytes = password.encode('utf-8')
+        salt = bcrypt.gensalt()
+        hashed_bytes = bcrypt.hashpw(password_bytes, salt)
+
+        return hashed_bytes.decode('utf-8')
 
     @staticmethod
     def _create_access_token(user_id: int) -> str:
