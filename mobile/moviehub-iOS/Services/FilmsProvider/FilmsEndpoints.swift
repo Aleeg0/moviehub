@@ -12,6 +12,8 @@ enum FilmsEndpoints: IEndpoint {
     case discoverMovies(DiscoverMoviesParams)
     case genres(language: DiscoverMoviesParams.DescriptionLanguage)
     case details(id: Int, language: DiscoverMoviesParams.DescriptionLanguage)
+    case images(filmId: Int)
+    case reviews(filmId: Int, page: Int)
     
     private static let PROTOCOL = "https://"
     private static let BASE_URL = "api.themoviedb.org/"
@@ -30,6 +32,10 @@ enum FilmsEndpoints: IEndpoint {
             "genre/movie/list"
         case .details(let id, _):
             "/movie/\(id)"
+        case .images(let id):
+            "/movie/\(id)/images"
+        case .reviews(let filmId, _):
+            "/movie/\(filmId)/reviews"
         }
     }
     
@@ -40,6 +46,10 @@ enum FilmsEndpoints: IEndpoint {
         case .genres:
                 .get
         case .details:
+                .get
+        case .images:
+                .get
+        case .reviews:
                 .get
         }
     }
@@ -56,6 +66,10 @@ enum FilmsEndpoints: IEndpoint {
             queryItems.append(.init(name: "language", value: language.rawValue))
         case .details(_, let language):
             queryItems.append(.init(name: "language", value: language.rawValue))
+        case .images:
+            break
+        case .reviews(_, let page):
+            queryItems.append(.init(name: "page", value: "\(page)"))
         }
         
         components?.queryItems = queryItems
