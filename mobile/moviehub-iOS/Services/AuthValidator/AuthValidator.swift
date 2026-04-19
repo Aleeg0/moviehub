@@ -40,6 +40,8 @@ protocol IAuthValidator {
     func getAuthErrors(dependency: LoginDependency) -> [IAuthValidationError]
     func getRegisterErrors(dependency: RegisterDependency) -> [IAuthValidationError]
     func checkEmail(email: String) -> [IAuthValidationError]
+    func checkPassword(password: String, type: FieldType) -> [any IAuthValidationError]
+    func checkPasswordsMatch(password: String, confirmPassword: String) -> [any IAuthValidationError]
     
 }
 
@@ -88,7 +90,7 @@ final class AuthValidator: IAuthValidator {
         
     }
     
-    private func checkPassword(password: String, type: FieldType) -> [any IAuthValidationError] {
+    func checkPassword(password: String, type: FieldType) -> [any IAuthValidationError] {
         var errors: [any IAuthValidationError] = []
         
         if password.isEmpty {
@@ -104,7 +106,7 @@ final class AuthValidator: IAuthValidator {
         return errors
     }
     
-    private func checkPasswordsMatch(password: String, confirmPassword: String) -> [any IAuthValidationError] {
+    func checkPasswordsMatch(password: String, confirmPassword: String) -> [any IAuthValidationError] {
         var errors: [any IAuthValidationError] = []
         
         if password != confirmPassword {

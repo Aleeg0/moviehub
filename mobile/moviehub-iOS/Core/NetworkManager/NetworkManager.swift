@@ -8,7 +8,12 @@
 import Foundation
 
 protocol INetworkManager {
-    func sendRequest<T: IEndpoint>(endpoint: T, body: Data?, authorization: NetworkManager.Authorization?) async throws(NetworkError) -> Data?
+    @discardableResult
+    func sendRequest<T: IEndpoint>(
+        endpoint: T,
+        body: Data?,
+        authorization: NetworkManager.Authorization?
+    ) async throws(NetworkError) -> Data?
 }
 
 struct NetworkManager: INetworkManager {
@@ -35,6 +40,7 @@ struct NetworkManager: INetworkManager {
         }
     }
     
+    @discardableResult
     func sendRequest<T: IEndpoint>(endpoint: T, body: Data?, authorization: Authorization?) async throws(NetworkError) -> Data? {
         guard let url = endpoint.url else { return nil }
         

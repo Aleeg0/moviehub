@@ -38,6 +38,9 @@
     "Confirm Password" : {
 
     },
+    "Confirm Your New Password" : {
+
+    },
     "Confirm Your Password" : {
 
     },
@@ -60,10 +63,16 @@
     "Email is empty" : {
 
     },
+    "Enter new password" : {
+
+    },
     "Enter the 5-digit code." : {
 
     },
-    "Enter Your Email" : {
+    "Enter your email." : {
+
+    },
+    "Enter Your New Password" : {
 
     },
     "Error" : {
@@ -158,7 +167,7 @@
     "Resend Code %@" : {
 
     },
-    "Reset Password" : {
+    "Reset password" : {
 
     },
     "Reviews" : {
@@ -178,7 +187,13 @@
     "Server error code %lld" : {
 
     },
+    "Unknown" : {
+
+    },
     "Unknown error occured" : {
+
+    },
+    "User already exists" : {
 
     },
     "User not found" : {

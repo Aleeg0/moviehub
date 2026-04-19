@@ -25,9 +25,10 @@ struct ForgotPasswordView: View {
                 loadingOTPView
             case .enterCode:
                 enterCodeView
-                    .onAppear {
-                        self.isFocused = true
-                    }
+            case.enterNewPassword:
+                enterNewPasswordView
+            case .success:
+                successView
             }
         }
         .frame(maxWidth: .infinity)
@@ -39,6 +40,61 @@ struct ForgotPasswordView: View {
                 .stroke(.authBlueTop, lineWidth: 1)
         )
         .padding(.bottom, 15)
+    }
+}
+
+private extension ForgotPasswordView {
+    
+    var successView: some View {
+        VStack(spacing: 25) {
+            Text("You have changed password successfully")
+                .font(.system(size: 24, weight: .semibold))
+                .multilineTextAlignment(.center)
+            
+            Image(systemName: "checkmark.circle")
+                .resizable()
+                .frame(width: 80, height: 80)
+                .foregroundStyle(.authBlueTop)
+            
+            AuthActionButton(caption: "Continue", action: viewModel.onResetPasswordEnd)
+        }
+    }
+}
+
+private extension ForgotPasswordView {
+    
+    var enterNewPasswordView: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Password")
+                .font(.system(size: 26, weight: .medium))
+            
+            Text("Enter new password")
+                .font(.system(size: 18, weight: .medium))
+            
+            VStack(spacing: 15) {
+                
+                textField(inputType: .password, errors: viewModel.resetPasswordValidationError as! [AuthValidationError]) {
+                    SecureField("", text: $viewModel.newPassword, prompt: Text("Enter Your New Password").font(.system(size: 20, weight: .semibold)))
+                        .keyboardType(.default)
+                }
+                
+                textField(inputType: .confirmPassword, errors: viewModel.resetPasswordValidationError as! [AuthValidationError]) {
+                    SecureField("", text: $viewModel.confirmNewPassword, prompt: Text("Confirm Your New Password").font(.system(size: 20, weight: .semibold)))
+                        .keyboardType(.default)
+                }
+                
+                if let error = viewModel.resetPasswordError {
+                    Text(error.description)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.red)
+                }
+            }
+            .animation(.bouncy, value: viewModel.resetPasswordError)
+            .animation(.bouncy, value: viewModel.resetPasswordValidationError as! [AuthValidationError])
+            
+            AuthActionButton(caption: "Change password", action: viewModel.resetPassword)
+            
+        }
     }
 }
 
@@ -68,10 +124,11 @@ private extension ForgotPasswordView {
                 }
             
             resendCodeButton
-            
-            
         }
         .animation(.bouncy, value: viewModel.resetPasswordStage)
+        .onAppear {
+            self.isFocused = true
+        }
     }
     
     var resendCodeButton: some View {
@@ -144,38 +201,66 @@ private extension ForgotPasswordView {
 
 private extension ForgotPasswordView {
     var gettingEmailView: some View {
-        VStack(spacing: 25) {
-            VStack(spacing: 10) {
-                Text("Reset Password")
-                    .foregroundStyle(.white)
-                    .font(.system(size: 27, weight: .semibold))
-                    .multilineTextAlignment(.center)
+        VStack(alignment: .leading, spacing: 25) {
+            
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Reset password")
+                    .font(.system(size: 26, weight: .medium))
                 
-                Text("Enter Your Email")
-                    .foregroundStyle(.white)
-                    .font(.system(size: 20, weight: .semibold))
-                    .multilineTextAlignment(.center)
+                Text("Enter your email.")
+                    .font(.system(size: 18, weight: .medium))
             }
             
-            VStack(alignment: .leading, spacing: 5) {
-                TextField("", text: $viewModel.model.emailForReset, prompt: Text(FieldType.email.prompt).font(.system(size: 20, weight: .semibold)))
-                    .modifier(AuthTextFieldModifier(error: viewModel.emailForResetError))
-                    .keyboardType(.emailAddress)
+            VStack(spacing: 10) {
                 
-                if let error = viewModel.emailForResetError {
+                textField(inputType: .email, errors: viewModel.emailForResetError == nil ? [] : [viewModel.emailForResetError!]) {
+                    TextField("", text: $viewModel.model.emailForReset, prompt: Text(FieldType.email.prompt).font(.system(size: 20, weight: .semibold)))
+                        .keyboardType(.emailAddress)
+                }
+                .animation(.bouncy, value: viewModel.emailForResetError)
+                
+                if let error = viewModel.resetPasswordError {
                     Text(error.description)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.red)
+                        .transition(.opacity.combined(with: .scale))
+                }
+            }
+                
+            AuthActionButton(caption: "Send code") {
+                viewModel.onOTPSend()
+                if viewModel.emailForResetError == nil {
+                    hideKeyboard()
+                }
+            }
+        }
+    }
+}
+
+private extension ForgotPasswordView {
+    
+    func textField<Content: View>(inputType: FieldType, errors: [AuthValidationError], content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            content()
+                .modifier(AuthTextFieldModifier(error: errors.first))
+            
+            if let specificError = errors.first(where: {
+                if case let .passwordError(_, type) = $0 { return type == inputType }
+                return false
+            }) {
+                if case let .passwordError(passwordError, _) = specificError {
+                    Text(passwordError.description)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.red)
                         .transition(.opacity.combined(with: .scale))
                 }
             }
-            .animation(.bouncy, value: viewModel.emailForResetError)
             
-            AuthActionButton(caption: "Send OTP") {
-                viewModel.onOTPSend()
-                if viewModel.emailForResetError == nil {
-                    hideKeyboard()
-                }
+            if case let .emailError(emailError) = errors.first {
+                Text(emailError.description)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.red)
+                    .transition(.opacity.combined(with: .scale))
             }
         }
     }
