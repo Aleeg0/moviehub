@@ -18,9 +18,30 @@ struct DecodeManager: IDecodeManager {
     
     init() {
         let decoder = JSONDecoder()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        decoder.dateDecodingStrategy = .formatted(formatter)
+        
+        let fullFormatter = DateFormatter()
+            fullFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            fullFormatter.locale = Locale(identifier: "en_US_POSIX")
+            
+            let shortFormatter = DateFormatter()
+            shortFormatter.dateFormat = "yyyy-MM-dd"
+            shortFormatter.locale = Locale(identifier: "en_US_POSIX")
+            
+            decoder.dateDecodingStrategy = .custom { decoder in
+                let container = try decoder.singleValueContainer()
+                let dateString = try container.decode(String.self)
+                
+
+                if let date = fullFormatter.date(from: dateString) {
+                    return date
+                }
+ 
+                if let date = shortFormatter.date(from: dateString) {
+                    return date
+                }
+                
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Неверный формат даты: \(dateString)")
+            }
         
         self.decoder = decoder
     }
