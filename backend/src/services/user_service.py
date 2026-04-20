@@ -1,5 +1,6 @@
 import secrets
 
+from pyasn1.codec.ber.decoder import stStop
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -8,10 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.enums import RedisKeys
 from src.core.errors import ResourceAlreadyExistsError, InvalidCredentialsError, ResourceNotFoundError, \
     UnauthorizedError
-from src.domain.models import User
+from src.domain.models import User, UserMovie
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserVerifyResetCode, ResetPasswordToken, UserBase, ResetPassword, \
-    LogoutRequest, RefreshRequest
+    LogoutRequest, RefreshRequest, CreateUserMovieRequest
 from .auth_service import AuthService
 from .mail_service import MailService
 
@@ -155,3 +156,20 @@ class UserService:
         user = result.scalar_one_or_none()
         await self.session.delete(user)
         await self.session.commit()
+
+
+    async def create_user_movie(self, payload: CreateUserMovieRequest) -> UserMovie:
+        user_movie = UserMovie(
+            user_id = payload.user_id,
+            movie_id = payload.movie_id,
+            status = payload.status,
+        )
+
+        try:
+            self.session.add(user_movie)
+            await self.session.commit()
+            await self.session.refresh(user_movie)
+            return user_movie
+        except IntegrityError as e:
+            await self.session.rollback()
+            raise ResourceAlreadyExistsError(f"{UserMovie.__name__} already exists") from e

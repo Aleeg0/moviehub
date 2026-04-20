@@ -1,11 +1,15 @@
 from fastapi.params import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core import get_db
-from src.services import WSService
+from src.deps import get_user_service
+from src.deps.movie import get_movie_service
+from src.services import WSService, MovieService, UserService
 
 
-def get_ws_service(session: AsyncSession = Depends(get_db)) -> WSService:
+def get_ws_service(
+    movie_service: MovieService = Depends(get_movie_service),
+    user_service: UserService = Depends(get_user_service)
+) -> WSService:
     return WSService(
-        session=session
+        movie_service=movie_service,
+        user_service=user_service,
     )

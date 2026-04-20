@@ -13,8 +13,8 @@ def get_auth_service(session: AsyncSession = Depends(get_db)) -> AuthService:
 
 async def get_user_id_http(
     authorization: HTTPAuthorizationCredentials = Depends(security),
-    auth_service: AuthService = Depends(AuthService)
-):
+    auth_service: AuthService = Depends(get_auth_service)
+) -> int:
     user_id = await auth_service.validate_access_token(authorization.credentials)
     if not user_id:
         raise UnauthorizedError("User unauthorized")
@@ -23,8 +23,8 @@ async def get_user_id_http(
 async def get_user_id_ws(
     token: str,
     auth_service: AuthService = Depends(get_auth_service),
-):
-    user_id = await auth_service.validate_access_token(token)
+) -> int:
+    user_id = await auth_service.validate_refresh_token(token)
     if not user_id:
         raise UnauthorizedError("User unauthorized")
     return user_id
