@@ -14,6 +14,8 @@ struct FilmCardView: View {
     private let film: FilmModel
     private let onSwipe: (FilmsViewModel.SwipeStatus) -> Void
     private let genres: String
+    private let onSwipe: () -> Void
+    private let onOpenDescription: (Int) -> Void
     
     @State private var offset: CGSize = .zero
     @State private var angle: CGFloat = .zero
@@ -22,6 +24,7 @@ struct FilmCardView: View {
         self.film = film
         self.genres = genres
         self.onSwipe = onSwipe
+        self.onOpenDescription = onOpenDescription
     }
     
     var body: some View {
@@ -100,16 +103,21 @@ struct FilmCardView: View {
 private extension FilmCardView {
     
     var descriptionButton: some View {
-        Image(systemName: "info.circle")
-            .font(.system(size: 43))
-            .padding(7)
-            .background {
-                Circle()
-                    .foregroundStyle(.achievementGray)
-                    .opacity(0.85)
-            }
+        Button {
+            onOpenDescription(film.id)
+        } label: {
+            Image(systemName: "info.circle")
+                .font(.system(size: 43))
+                .padding(7)
+                .background {
+                    Circle()
+                        .foregroundStyle(.achievementGray)
+                        .opacity(0.85)
+                }
+                .foregroundStyle(.white)
+        }
+
     }
-    
 }
 
 private extension FilmCardView {

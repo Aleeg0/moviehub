@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FC67C57B2F8830D800863931 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = FC67C57A2F8830D800863931 /* Kingfisher */; };
+		FC266F302F8CFDD2008C8C1B /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = FC266F2F2F8CFDD2008C8C1B /* Kingfisher */; };
+		FC266F402F8E2235008C8C1B /* Shimmer in Frameworks */ = {isa = PBXBuildFile; productRef = FC266F3F2F8E2235008C8C1B /* Shimmer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC67C57B2F8830D800863931 /* Kingfisher in Frameworks */,
+				FC266F402F8E2235008C8C1B /* Shimmer in Frameworks */,
+				FC266F302F8CFDD2008C8C1B /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +72,8 @@
 			);
 			name = "moviehub-iOS";
 			packageProductDependencies = (
-				FC67C57A2F8830D800863931 /* Kingfisher */,
+				FC266F2F2F8CFDD2008C8C1B /* Kingfisher */,
+				FC266F3F2F8E2235008C8C1B /* Shimmer */,
 			);
 			productName = "moviehub-iOS";
 			productReference = FC7711902F621560000EADE1 /* moviehub-iOS.app */;
@@ -101,7 +104,8 @@
 			mainGroup = FC7711872F621560000EADE1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				FC67C5792F8830D800863931 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				FC266F2E2F8CFDD2008C8C1B /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				FC266F3E2F8E2235008C8C1B /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FC7711912F621560000EADE1 /* Products */;
@@ -347,7 +351,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		FC67C5792F8830D800863931 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+		FC266F2E2F8CFDD2008C8C1B /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
@@ -355,13 +359,26 @@
 				minimumVersion = 8.8.1;
 			};
 		};
+		FC266F3E2F8E2235008C8C1B /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/markiv/SwiftUI-Shimmer.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FC67C57A2F8830D800863931 /* Kingfisher */ = {
+		FC266F2F2F8CFDD2008C8C1B /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FC67C5792F8830D800863931 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			package = FC266F2E2F8CFDD2008C8C1B /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		FC266F3F2F8E2235008C8C1B /* Shimmer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC266F3E2F8E2235008C8C1B /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */;
+			productName = Shimmer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

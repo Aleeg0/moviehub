@@ -27,7 +27,10 @@ struct FilmStackView: View {
                     FilmCardView(
                         film: film,
                         genres: viewModel.filmGenres(film: film),
-                        onSwipe: viewModel.onSwipe
+                        onSwipe: viewModel.onSwipe,
+                        onOpenDescription: { filmId in
+                            self.viewModel.showDetails(filmId: filmId)
+                        }
                     )
                     .scaleEffect(0.85 + CGFloat(index) * 0.04)
                     .zIndex(-Double(index))
@@ -45,6 +48,9 @@ struct FilmStackView: View {
                     actionButton(type: button)
                 }
             }
+        }
+        .sheet(isPresented: $viewModel.isShowingDetails) {
+            FilmDetailsView(viewModel: .init(filmsProvider: FilmsProvider(networkManager: NetworkManager(), decoder: DecodeManager()), filmId: viewModel.selectedFilmId ?? 1))
         }
     }
     

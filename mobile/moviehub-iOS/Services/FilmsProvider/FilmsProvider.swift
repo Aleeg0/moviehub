@@ -13,6 +13,9 @@ protocol IFilmsProvider {
     func fetchGenres(language: FilmsEndpoints.DiscoverMoviesParams.DescriptionLanguage) async throws -> [GenreModel]
     func prefetchImages(urls: [URL])
     func fetchFilmDetails(id: Int, language: FilmsEndpoints.DiscoverMoviesParams.DescriptionLanguage) async throws -> FilmDetailsModel
+    
+    func fetchFilmImages(id: Int) async throws -> ImagesModel
+    func fetchReviews(id: Int, page: Int) async throws -> [ReviewModel]
 }
 
 final class FilmsProvider: IFilmsProvider {
@@ -30,6 +33,31 @@ final class FilmsProvider: IFilmsProvider {
         let prefetcher = ImagePrefetcher(urls: urls)
         prefetcher.start()
         self.prefetcher = prefetcher
+    }
+    
+    func fetchReviews(id: Int, page: Int) async throws -> [ReviewModel] {
+        do {
+            guard let data = try await networkManager.sendRequest(endpoint: FilmsEndpoints.reviews(filmId: id, page: page), body: nil, authorization: .bearer(token: FilmsEndpoints.TOKEN)) else { throw NSError() }
+            
+            guard let response: ReviewResponseDTO = decoder.decode(data: data) else { throw NSError() }
+            
+            return response.results.map({ ReviewModel(from: $0) })
+            
+        } catch let error {
+            throw error
+        }
+    }
+    
+    func fetchFilmImages(id: Int) async throws -> ImagesModel {
+        do {
+            guard let data = try await networkManager.sendRequest(endpoint: FilmsEndpoints.images(filmId: id), body: nil, authorization: .bearer(token: FilmsEndpoints.TOKEN)) else { throw NSError() }
+            
+            guard let response: ImagesDTO = decoder.decode(data: data) else { throw NSError() }
+            
+            return ImagesModel(from: response)
+        } catch let error {
+            throw error
+        }
     }
     
     func fetchFilmDetails(id: Int, language: FilmsEndpoints.DiscoverMoviesParams.DescriptionLanguage) async throws -> FilmDetailsModel {

@@ -12,6 +12,9 @@ final class FilmsViewModel: ObservableObject {
     
     @Published var films: [FilmModel] = []
     @Published var genres: [Int : String] = [:]
+    @Published var isShowingDetails = false
+    @Published var selectedFilmId: Int?
+    
     
     private let filmsProvider: IFilmsProvider
     private let swipeService: SwipeServiceProtocol
@@ -30,6 +33,11 @@ final class FilmsViewModel: ObservableObject {
     
     var visibleFilms: ArraySlice<FilmModel> {
         films.prefix(3)
+    }
+    
+    func showDetails(filmId: Int) {
+        self.selectedFilmId = filmId
+        self.isShowingDetails = true
     }
     
     func filmGenres(film: FilmModel) -> String {
