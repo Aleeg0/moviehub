@@ -1,4 +1,6 @@
 from .auth_service import AuthService
 from .mail_service import MailService
+from .movie_service import MovieService
 from .pdf_service import PdfService
 from .user_service import UserService
+from .ws_service import WSService

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import EmailStr, Field
 
+from src.domain.models import UserMovieStatus
 from .base import BaseSchema
 
 
@@ -20,7 +21,7 @@ class UserResponse(UserBase):
     created_at: datetime
 
 class LogoutRequest(BaseSchema):
-    access_token: str
+    user_id: int
 
 class RefreshRequest(BaseSchema):
     refresh_token: str
@@ -39,3 +40,9 @@ class ResetPasswordToken(BaseSchema):
 
 class ResetPassword(UserBase, ResetPasswordToken):
     new_password: str = Field(min_length=8, max_length=64)
+
+# Service
+class CreateUserMovieRequest(BaseSchema):
+    user_id: int
+    movie_id: int
+    status: UserMovieStatus

@@ -14,28 +14,76 @@ protocol INetworkManager {
         body: Data?,
         authorization: NetworkManager.Authorization?
     ) async throws(NetworkError) -> Data?
+    
+    func connectWebsocket(url: URL?)
+    func sendWithWebsocket(data: Data?)
 }
 
-struct NetworkManager: INetworkManager {
+final class NetworkManager: NSObject, INetworkManager {
     
-    enum Authorization {
-        case bearer(token: String)
+    private var websocketTask: URLSessionWebSocketTask?
+    private var pingTimer: Timer?
+    private var isConnecting = false
+    private var url: URL?
+    private var session: URLSession?
+    
+    func connectWebsocket(url: URL?) {
+        guard let url = url else { return }
+        self.url = url
         
-        var httpHeader: String {
-            self.title + " " + self.token
-        }
+        session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
+        isConnecting = true
+        self.websocketTask = session?.webSocketTask(with: url)
+        self.websocketTask?.resume()
+        startPinging()
+    }
+    
+    func sendWithWebsocket(data: Data?) {
+        guard let data = data, let jsonData = String(data: data, encoding: .utf8) else { return }
         
-        private var title: String {
-            switch self {
-            case .bearer:
-                "Bearer"
+        print(jsonData)
+        
+        let message = URLSessionWebSocketTask.Message.string(jsonData)
+        websocketTask?.send(message) { error in
+            if let error = error {
+                print("ERROR SENDING" + error.localizedDescription)
+                print("DOWN DOWN DOWN")
+            } else {
+                print("send succeed")
             }
         }
-        
-        private var token: String {
-            switch self {
-            case .bearer(let token):
-                token
+    }
+    
+    private func stopPinging() {
+        self.pingTimer?.invalidate()
+        self.pingTimer = nil
+    }
+    
+    private func startPinging() {
+        self.pingTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            self?.sendPing()
+        }
+    }
+    
+    private func sendPing() {
+        let message = URLSessionWebSocketTask.Message.string("{\"action\": \"ping\"}")
+        self.websocketTask?.send(message) { error in
+            if let error = error {
+                print("ERROR PING" + error.localizedDescription)
+                print("DOWN DOWN DOWN")
+
+                self.stopPinging()
+
+            } else {
+                print("ping succeed")
+            }
+        }
+        self.websocketTask?.receive { result in
+            switch result {
+            case .success(let success):
+                print("----------\(success)")
+            case .failure(let failure):
+                print("+++++++++\(failure.localizedDescription)")
             }
         }
     }
@@ -71,6 +119,45 @@ struct NetworkManager: INetworkManager {
             throw .networkError(error)
         }
     }
+}
+
+extension NetworkManager: URLSessionWebSocketDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        print("DOWN DOWN DOWN")
+
+        stopPinging()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.connectWebsocket(url: self?.url)
+        }
+    }
     
-    
+    func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+        print("CONNECTED")
+        self.isConnecting = false
+    }
+}
+
+extension NetworkManager {
+    enum Authorization {
+        case bearer(token: String)
+        
+        var httpHeader: String {
+            self.title + " " + self.token
+        }
+        
+        private var title: String {
+            switch self {
+            case .bearer:
+                "Bearer"
+            }
+        }
+        
+        private var token: String {
+            switch self {
+            case .bearer(let token):
+                token
+            }
+        }
+    }
 }

@@ -3,8 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from src.api.v1.healtcheck import hc_router
-from src.api.v1.router import router
+from src.api.v1 import hc_router, router, ws_router
 from src.core import connect_to_db, close_db, config, connect_to_redis, close_redis, init_mail
 from src.core.errors import register_error_handlers
 
@@ -35,4 +34,5 @@ app.add_middleware(
 register_error_handlers(app)
 
 app.include_router(router, prefix="/api")
+app.include_router(ws_router, prefix="/ws")
 app.include_router(hc_router, prefix="/health")

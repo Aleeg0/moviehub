@@ -30,9 +30,6 @@ struct RootView: View {
                     .transition(.opacity.combined(with: .scale))
             }
         }
-        .onAppear {
-            viewModel.onExit()
-        }
         .animation(.easeInOut, value: viewModel.isSigned)
     }
 }

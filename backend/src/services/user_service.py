@@ -1,5 +1,6 @@
 import secrets
 
+from pyasn1.codec.ber.decoder import stStop
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -8,11 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.enums import RedisKeys
 from src.core.errors import ResourceAlreadyExistsError, InvalidCredentialsError, ResourceNotFoundError, \
     UnauthorizedError
-from src.deps.auth import get_password_hash, verify_password
-from src.domain.models import User
+from src.domain.models import User, UserMovie
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserVerifyResetCode, ResetPasswordToken, UserBase, ResetPassword, \
-    LogoutRequest, RefreshRequest
+    LogoutRequest, RefreshRequest, CreateUserMovieRequest
 from .auth_service import AuthService
 from .mail_service import MailService
 
@@ -32,7 +32,7 @@ class UserService:
 
 
     async def register(self, payload: UserRegister) -> TokensResponse:
-        hashed_password = get_password_hash(payload.password)
+        hashed_password = self.auth_service.get_password_hash(payload.password)
 
         user: User = User(
             email=payload.email,
@@ -64,7 +64,7 @@ class UserService:
         if not user:
             raise InvalidCredentialsError("Incorrect email or password")
 
-        if not verify_password(payload.password, user.hashed_password):
+        if not self.auth_service.verify_password(payload.password, user.hashed_password):
             raise InvalidCredentialsError("Incorrect email or password")
 
         tokens = self.auth_service.generate_tokens(user.id)
@@ -74,11 +74,7 @@ class UserService:
 
 
     async def logout(self, payload: LogoutRequest) -> None:
-        user_id = await self.auth_service.validate_access_token(payload.access_token)
-        if not user_id:
-            raise UnauthorizedError("User unauthorized")
-
-        await self.auth_service.revoke_token(user_id)
+        await self.auth_service.revoke_token(payload.user_id)
 
     async def refresh(self, payload: RefreshRequest) -> TokensResponse:
         user_id = await self.auth_service.validate_refresh_token(payload.refresh_token)
@@ -147,7 +143,7 @@ class UserService:
         if not user:
             raise ResourceNotFoundError("User no longer exists")
 
-        user.hashed_password = get_password_hash(payload.new_password)
+        user.hashed_password = self.auth_service.get_password_hash(payload.new_password)
         await self.session.commit()
 
         await self.redis.delete(token_key)
@@ -160,3 +156,20 @@ class UserService:
         user = result.scalar_one_or_none()
         await self.session.delete(user)
         await self.session.commit()
+
+
+    async def create_user_movie(self, payload: CreateUserMovieRequest) -> UserMovie:
+        user_movie = UserMovie(
+            user_id = payload.user_id,
+            movie_id = payload.movie_id,
+            status = payload.status,
+        )
+
+        try:
+            self.session.add(user_movie)
+            await self.session.commit()
+            await self.session.refresh(user_movie)
+            return user_movie
+        except IntegrityError as e:
+            await self.session.rollback()
+            raise ResourceAlreadyExistsError(f"{UserMovie.__name__} already exists") from e

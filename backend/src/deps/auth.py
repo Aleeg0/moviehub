@@ -1,18 +1,30 @@
-import bcrypt
-from datetime import datetime, timedelta, UTC
-from jose import jwt
+from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core import config
+from src.core import get_db
+from src.core.errors import UnauthorizedError
+from src.services import AuthService
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    password_bytes = plain_password.encode('utf-8')
-    hash_bytes = hashed_password.encode('utf-8')
+security = HTTPBearer()
 
-    return bcrypt.checkpw(password_bytes, hash_bytes)
+def get_auth_service(session: AsyncSession = Depends(get_db)) -> AuthService:
+    return AuthService(session=session)
 
-def get_password_hash(password: str) -> str:
-    password_bytes = password.encode('utf-8')
-    salt = bcrypt.gensalt()
-    hashed_bytes = bcrypt.hashpw(password_bytes, salt)
+async def get_user_id_http(
+    authorization: HTTPAuthorizationCredentials = Depends(security),
+    auth_service: AuthService = Depends(get_auth_service)
+) -> int:
+    user_id = await auth_service.validate_access_token(authorization.credentials)
+    if not user_id:
+        raise UnauthorizedError("User unauthorized")
+    return user_id
 
-    return hashed_bytes.decode('utf-8')
+async def get_user_id_ws(
+    token: str,
+    auth_service: AuthService = Depends(get_auth_service),
+) -> int:
+    user_id = await auth_service.validate_refresh_token(token)
+    if not user_id:
+        raise UnauthorizedError("User unauthorized")
+    return user_id

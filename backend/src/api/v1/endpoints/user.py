@@ -3,8 +3,8 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends
 from fastapi.responses import FileResponse
 
-from src.api.v1.dep import get_user_service, get_pdf_service, get_access_token
 from src.core import config
+from src.deps import get_user_id_http, get_user_service, get_pdf_service
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserBase, UserVerifyResetCode, ResetPassword, \
     ResetPasswordToken, LogoutRequest, RefreshRequest
@@ -22,10 +22,10 @@ async def register(request: UserRegister, service: UserService = Depends(get_use
 
 @router.post("/logout", status_code=HTTPStatus.NO_CONTENT)
 async def logout(
-    token: str = Depends(get_access_token),
+    user_id: int = Depends(get_user_id_http),
     service: UserService = Depends(get_user_service)
 ):
-    await service.logout(LogoutRequest(access_token=token))
+    await service.logout(LogoutRequest(user_id=user_id))
 
 @router.post("/refresh", response_model=TokensResponse, status_code=HTTPStatus.OK)
 async def refresh(request: RefreshRequest, service: UserService = Depends(get_user_service)):

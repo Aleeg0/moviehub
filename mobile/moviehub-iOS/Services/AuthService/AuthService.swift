@@ -30,6 +30,7 @@ final class AuthService: IAuthService {
     private let privateStorageTokenKey = "token"
     private let resetTokenKey = "resetToken"
     private let userInfoKey = "userInfo"
+    private let refreshTokenKey = "refreshToken"
     
     init(networkManager: INetworkManager, decoder: IDecodeManager, privateStorage: IPrivateManager) {
         self.networkManager = networkManager
@@ -125,6 +126,7 @@ final class AuthService: IAuthService {
         
         if let response: AuthResponseDTO = decoder.decode(data: data) {
             privateStorage.store(key: privateStorageTokenKey, object: response.accessToken)
+            privateStorage.store(key: refreshTokenKey, object: response.refreshToken)
         }
         else if let error: ErrorAuthResponseDTO = decoder.decode(data: data) {
             throw .loginError(.unknown(message: "\(error.detail.first?.msg ?? "Error")"))
@@ -151,6 +153,7 @@ final class AuthService: IAuthService {
         
         if let response: AuthResponseDTO = decoder.decode(data: data) {
             privateStorage.store(key: privateStorageTokenKey, object: response.accessToken)
+            privateStorage.store(key: refreshTokenKey, object: response.refreshToken)
         }
         else if let error: ErrorAuthResponseDTO = decoder.decode(data: data) {
             throw .registerError(.unknown(message: "\(error.detail.first?.msg ?? "Error")"))
