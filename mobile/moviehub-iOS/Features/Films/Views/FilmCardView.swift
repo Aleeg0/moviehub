@@ -12,13 +12,13 @@ import Kingfisher
 struct FilmCardView: View {
     
     private let film: FilmModel
-    private let onSwipe: () -> Void
+    private let onSwipe: (FilmsViewModel.SwipeStatus) -> Void
     private let genres: String
     
     @State private var offset: CGSize = .zero
     @State private var angle: CGFloat = .zero
     
-    init(film: FilmModel, genres: String, onSwipe: @escaping () -> Void) {
+    init(film: FilmModel, genres: String, onSwipe: @escaping (FilmsViewModel.SwipeStatus) -> Void) {
         self.film = film
         self.genres = genres
         self.onSwipe = onSwipe
@@ -124,16 +124,19 @@ private extension FilmCardView {
             
             if gesture.translation.width > 200 {
                 self.offset.width = 500
+                self.onSwipe(.liked)
             }
             
             else if gesture.translation.width < -200 {
                 self.offset.width = -500
+                self.onSwipe(.disliked)
             }
             
             else if gesture.translation.height < -300 {
                 self.offset.height = -1000
+                self.onSwipe(.viewed)
             }
-            onSwipe()
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 withAnimation(nil) {
                     offset = .zero

@@ -15,6 +15,7 @@ protocol IDecodeManager {
 struct DecodeManager: IDecodeManager {
     
     private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
     
     init() {
         let decoder = JSONDecoder()
@@ -23,6 +24,10 @@ struct DecodeManager: IDecodeManager {
         decoder.dateDecodingStrategy = .formatted(formatter)
         
         self.decoder = decoder
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .formatted(formatter)
+        self.encoder = encoder
     }
     
     
@@ -36,7 +41,7 @@ struct DecodeManager: IDecodeManager {
     
     func encode<T: Encodable>(data: T) -> Data? {
         do {
-            return try? JSONEncoder().encode(data)
+            return try? encoder.encode(data)
         } catch let error {
             
         }

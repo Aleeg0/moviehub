@@ -14,12 +14,16 @@ final class FilmsViewModel: ObservableObject {
     @Published var genres: [Int : String] = [:]
     
     private let filmsProvider: IFilmsProvider
+    private let swipeService: SwipeServiceProtocol
+    
     private var page: Int
     
-    init(filmsProvider: IFilmsProvider) {
+    init(filmsProvider: IFilmsProvider, swipeService: SwipeServiceProtocol) {
         self.filmsProvider = filmsProvider
-        self.page = 79//Int.random(in: 1...100)
+        self.swipeService = swipeService
+        self.page = Int.random(in: 1...100)
         
+        self.swipeService.connect()
         fetchGenres()
         fetchFilms()
     }
@@ -46,7 +50,9 @@ final class FilmsViewModel: ObservableObject {
         }
     }
     
-    func onSwipe() {
+    func onSwipe(status: SwipeStatus) {
+        guard let movie = films.first else { return }
+        self.swipeService.sendMovieInfo(movie: movie, status: status)
         self.films.removeFirst()
         self.fetchFilms()
     }
@@ -69,6 +75,14 @@ final class FilmsViewModel: ObservableObject {
         films.removeFirst()
     }
     
+}
+
+extension FilmsViewModel {
+    enum SwipeStatus {
+        case liked
+        case disliked
+        case viewed
+    }
 }
 
 extension FilmsViewModel {

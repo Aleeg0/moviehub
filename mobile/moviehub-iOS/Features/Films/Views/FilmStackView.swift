@@ -14,7 +14,7 @@ struct FilmStackView: View {
         filmsProvider: FilmsProvider(
                 networkManager: NetworkManager(),
                 decoder: DecodeManager()
-            ))
+        ), swipeService: SwipeService(dependency: .init(networkManager: NetworkManager(), privateStorage: UserDefaultsStorageManager(), decoder: DecodeManager())))
 
     var body: some View {
         VStack(spacing: 40) {
