@@ -65,3 +65,11 @@ class GetUserMovieResponse(BaseSchema):
 
 class GetUserMoviesResponse(BaseSchema):
     movies: list[GetUserMovieResponse]
+
+class GetUserMoviesStatisticRequest(BaseSchema):
+    user_id: int
+
+class GetUserMoviesStatisticResponse(BaseSchema):
+    liked: int
+    disliked: int
+    viewed: int

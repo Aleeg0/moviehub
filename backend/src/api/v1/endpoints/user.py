@@ -5,9 +5,11 @@ from fastapi.responses import FileResponse
 
 from src.core import config
 from src.deps import get_user_id_http, get_user_service, get_pdf_service
+from src.schemas import GetUserMoviesStatisticRequest
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserBase, UserVerifyResetCode, ResetPassword, \
-    ResetPasswordToken, LogoutRequest, RefreshRequest, GetUserMoviesResponse, GetUserMoviesRequest
+    ResetPasswordToken, LogoutRequest, RefreshRequest, GetUserMoviesResponse, GetUserMoviesRequest, \
+    GetUserMoviesStatisticResponse
 from src.services import UserService, PdfService
 
 router = APIRouter(prefix="/users")
@@ -59,3 +61,7 @@ async def reset_password(request: ResetPassword, service: UserService = Depends(
 @router.get("/movies", response_model=GetUserMoviesResponse, status_code=HTTPStatus.OK)
 async def get_user_movies(user_id: int = Depends(get_user_id_http), service: UserService = Depends(get_user_service)):
     return await service.get_user_movies(GetUserMoviesRequest(user_id=user_id))
+
+@router.get("/movies/statistic", response_model=GetUserMoviesStatisticResponse, status_code=HTTPStatus.OK)
+async def get_user_movies_statistic(user_id: int = Depends(get_user_id_http), service: UserService = Depends(get_user_service)):
+    return await service.get_user_movies_statistic(GetUserMoviesStatisticRequest(user_id=user_id))

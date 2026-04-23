@@ -1,16 +1,16 @@
 import secrets
 
 from redis.asyncio import Redis
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.enums import RedisKeys
 from src.core.errors import ResourceAlreadyExistsError, InvalidCredentialsError, ResourceNotFoundError, \
     UnauthorizedError
-from src.domain.models import User, UserMovie, Movie
+from src.domain.models import User, UserMovie, Movie, UserMovieStatus
 from src.schemas import CreateUserMovieRequest, CreateUserMovieResponse, GetUserMoviesRequest, GetUserMoviesResponse, \
-    GetUserMovieResponse
+    GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserVerifyResetCode, ResetPasswordToken, UserBase, ResetPassword, \
     LogoutRequest, RefreshRequest
@@ -30,7 +30,6 @@ class UserService:
         self.mail_service = mail_service
         self.auth_service = auth_service
         self.redis = redis
-
 
     async def register(self, payload: UserRegister) -> TokensResponse:
         hashed_password = self.auth_service.get_password_hash(payload.password)
@@ -56,7 +55,6 @@ class UserService:
 
         return tokens
 
-
     async def login(self, payload: UserLogin) -> TokensResponse:
         result = await self.session.execute(select(User).where(User.email == payload.email))
 
@@ -72,7 +70,6 @@ class UserService:
         await self.auth_service.save_token(user.id, tokens.refresh_token)
 
         return tokens
-
 
     async def logout(self, payload: LogoutRequest) -> None:
         await self.auth_service.revoke_token(payload.user_id)
@@ -175,11 +172,11 @@ class UserService:
             raise ResourceAlreadyExistsError(f"{UserMovie.__name__} already exists") from e
 
     async def get_user_movies(self, request: GetUserMoviesRequest) -> GetUserMoviesResponse:
-        smtp = (select(UserMovie.status, Movie)
+        stmt = (select(UserMovie.status, Movie)
                 .join(Movie, UserMovie.movie_id == Movie.id)
                 .where(UserMovie.user_id == request.user_id))
 
-        result = await self.session.execute(smtp)
+        result = await self.session.execute(stmt)
         user_movies = result.all()
 
         return GetUserMoviesResponse(
@@ -198,3 +195,31 @@ class UserService:
             ]
         )
 
+    async def get_user_movies_statistic(self, request: GetUserMoviesStatisticRequest) -> GetUserMoviesStatisticResponse:
+        stmt = (select(
+            UserMovie.status,
+            func.count(UserMovie.status).label('count')
+        )
+        .where(UserMovie.user_id == request.user_id)
+        .group_by(UserMovie.status))
+
+        result = await self.session.execute(stmt)
+        stats = result.all()
+
+        liked = 0
+        disliked = 0
+        viewed = 0
+
+        for status, count in stats:
+            if status == UserMovieStatus.LIKED:
+                liked = count
+            elif status == UserMovieStatus.DISLIKED:
+                disliked = count
+            elif status == UserMovieStatus.VIEWED:
+                viewed = count
+
+        return GetUserMoviesStatisticResponse(
+            liked=liked,
+            disliked=disliked,
+            viewed=viewed
+        )
