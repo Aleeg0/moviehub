@@ -12,7 +12,7 @@ class UpsertMovieRequest(BaseSchema):
     vote_average: float
     genre_id: int | None = None
 
-class MovieResponse(BaseSchema):
+class UpsertMovieResponse(BaseSchema):
     id: int
     external_id: int
     title: str

@@ -1,6 +1,5 @@
 import secrets
 
-from pyasn1.codec.ber.decoder import stStop
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -9,10 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.enums import RedisKeys
 from src.core.errors import ResourceAlreadyExistsError, InvalidCredentialsError, ResourceNotFoundError, \
     UnauthorizedError
-from src.domain.models import User, UserMovie
+from src.domain.models import User, UserMovie, Movie
+from src.schemas import CreateUserMovieRequest, CreateUserMovieResponse, GetUserMoviesRequest, GetUserMoviesResponse, \
+    GetUserMovieResponse
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserVerifyResetCode, ResetPasswordToken, UserBase, ResetPassword, \
-    LogoutRequest, RefreshRequest, CreateUserMovieRequest
+    LogoutRequest, RefreshRequest
 from .auth_service import AuthService
 from .mail_service import MailService
 
@@ -86,7 +87,6 @@ class UserService:
 
         return tokens
 
-
     async def send_reset_mail(self, payload: UserBase) -> None:
         result = await self.session.execute(select(User).where(User.email == payload.email))
         user = result.scalar_one_or_none()
@@ -158,7 +158,7 @@ class UserService:
         await self.session.commit()
 
 
-    async def create_user_movie(self, payload: CreateUserMovieRequest) -> UserMovie:
+    async def create_user_movie(self, payload: CreateUserMovieRequest) -> CreateUserMovieResponse:
         user_movie = UserMovie(
             user_id = payload.user_id,
             movie_id = payload.movie_id,
@@ -169,7 +169,32 @@ class UserService:
             self.session.add(user_movie)
             await self.session.commit()
             await self.session.refresh(user_movie)
-            return user_movie
+            return CreateUserMovieResponse.model_validate(user_movie)
         except IntegrityError as e:
             await self.session.rollback()
             raise ResourceAlreadyExistsError(f"{UserMovie.__name__} already exists") from e
+
+    async def get_user_movies(self, request: GetUserMoviesRequest) -> GetUserMoviesResponse:
+        smtp = (select(UserMovie.status, Movie)
+                .join(Movie, UserMovie.movie_id == Movie.id)
+                .where(UserMovie.user_id == request.user_id))
+
+        result = await self.session.execute(smtp)
+        user_movies = result.all()
+
+        return GetUserMoviesResponse(
+            movies=[
+                GetUserMovieResponse(
+                    id=movie.id,
+                    external_id=movie.id,
+                    title=movie.title,
+                    release_date=movie.release_date,
+                    poster_path=movie.poster_path,
+                    genre_id=movie.genre_id,
+                    vote_average=movie.vote_average,
+                    status=status
+                )
+                for status, movie in user_movies
+            ]
+        )
+

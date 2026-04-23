@@ -7,7 +7,7 @@ from src.core import config
 from src.deps import get_user_id_http, get_user_service, get_pdf_service
 from src.schemas.auth import TokensResponse
 from src.schemas.user import UserLogin, UserRegister, UserBase, UserVerifyResetCode, ResetPassword, \
-    ResetPasswordToken, LogoutRequest, RefreshRequest
+    ResetPasswordToken, LogoutRequest, RefreshRequest, GetUserMoviesResponse, GetUserMoviesRequest
 from src.services import UserService, PdfService
 
 router = APIRouter(prefix="/users")
@@ -55,3 +55,7 @@ async def reset_verify(request: UserVerifyResetCode, service: UserService = Depe
 @router.patch("/reset/password", response_model=None, status_code=HTTPStatus.NO_CONTENT)
 async def reset_password(request: ResetPassword, service: UserService = Depends(get_user_service)):
     return await service.change_password(request)
+
+@router.get("/movies", response_model=GetUserMoviesResponse, status_code=HTTPStatus.OK)
+async def get_user_movies(user_id: int = Depends(get_user_id_http), service: UserService = Depends(get_user_service)):
+    return await service.get_user_movies(GetUserMoviesRequest(user_id=user_id))
