@@ -1,34 +1,19 @@
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.domain.models import Movie
+from src.domain.repositories import UnitOfWork, MovieRepository
 from src.schemas import UpsertMovieRequest, UpsertMovieResponse
 
 
 class MovieService:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+    def __init__(
+        self,
+        uof: UnitOfWork,
+        movie_repo: MovieRepository,
+    ):
+        self.uof = uof
+        self.movie_repo = movie_repo
 
-    async def upsert(self, request: UpsertMovieRequest) -> UpsertMovieResponse:
-        smtp = insert(Movie).values(
-            external_id=request.external_id,
-            title=request.title,
-            genre_id=request.genre_id,
-            poster_path=request.poster_path,
-            release_date=request.release_date,
-            vote_average=request.vote_average,
-        )
-        smtp = smtp.on_conflict_do_update(
-            index_elements=["external_id"],
-            set_={
-                "title": request.title,
-                "genre_id": request.genre_id,
-                "poster_path": request.poster_path,
-                "release_date": request.release_date,
-                "vote_average": request.vote_average,
-            }
-        ).returning(Movie)
+    async def upsert_movie(self, request: UpsertMovieRequest) -> UpsertMovieResponse:
+        async with self.uof:
+            movie = await self.movie_repo.upsert(request.model_dump())
+            await self.uof.commit()
 
-        upsert_movie = await self.session.scalars(smtp)
-
-        return upsert_movie.one()
+        return UpsertMovieResponse.model_validate(movie)

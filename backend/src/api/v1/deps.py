@@ -1,15 +1,11 @@
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core import get_db
 from src.core.errors import UnauthorizedError
 from src.services import AuthService
+from src.services.deps import get_auth_service
 
 security = HTTPBearer()
-
-def get_auth_service(session: AsyncSession = Depends(get_db)) -> AuthService:
-    return AuthService(session=session)
 
 async def get_user_id_http(
     authorization: HTTPAuthorizationCredentials = Depends(security),

@@ -11,6 +11,6 @@ class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    token: Mapped[str] = mapped_column(String(200), unique=True, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    token: Mapped[str] = mapped_column(String(200), unique=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

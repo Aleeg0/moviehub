@@ -17,7 +17,7 @@ class WSService:
     async def handle_seen_movie_msg(self, payload: HandleSeenMovieRequest) -> WSRes:
         try:
             row_movie = UpsertMovieRequest.model_validate(payload.movie)
-            movie = await self.movie_service.upsert(row_movie)
+            movie = await self.movie_service.upsert_movie(row_movie)
 
             row_view_movie = CreateUserMovieRequest(
                 user_id=payload.user_id,

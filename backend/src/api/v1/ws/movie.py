@@ -3,9 +3,10 @@ from fastapi.params import Depends
 from pydantic import TypeAdapter
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from src.deps import get_user_id_ws, get_ws_service
 from src.schemas import HandleSeenMovieRequest, WSMsg, SeenMovieMsg, PingMsg, WSStatus, WSRes
 from src.services import WSService
+from src.services.deps import get_ws_service
+from ..deps import get_user_id_ws
 
 router = APIRouter()
 
