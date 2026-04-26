@@ -32,7 +32,10 @@ final class SwipeService: SwipeServiceProtocol {
     }
     
     func connect() {
+        guard let access: String = self.privateStorage.fetch(key: "token") else { return }
         guard let token: String = self.privateStorage.fetch(key: "refreshToken") else { return }
+        print("access : \(access)")
+        print("---------")
         
         networkManager.connectWebsocket(
             url: SwipeServiceEndpoints.websocketMovieTracking(refreshToken: token).url

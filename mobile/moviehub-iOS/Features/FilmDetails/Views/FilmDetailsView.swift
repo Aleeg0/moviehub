@@ -41,6 +41,7 @@ private extension FilmDetailsView {
     var detailsView: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
+                
                 posterView
                 
                 Text(viewModel.details?.title ?? "No title")
@@ -54,13 +55,21 @@ private extension FilmDetailsView {
                 
                 filmDescriptionBlock
                 
-                mediaListView(title: "Backdrops", media: viewModel.images?.backdrops ?? [])
+                if let images = viewModel.images, !images.backdrops.isEmpty {
+                    mediaListView(title: "Backdrops", media: Array(images.backdrops.prefix(3)))
+                }
                 
-                mediaListView(title: "Posters", media: viewModel.images?.posters ?? [])
+                if let images = viewModel.images, !images.posters.isEmpty {
+                    mediaListView(title: "Posters", media: Array(images.posters.prefix(3)))
+                }
                 
-                mediaListView(title: "Logos", media: viewModel.images?.logos ?? [])
+                if let images = viewModel.images, !images.logos.isEmpty {
+                    mediaListView(title: "Logos", media: Array(images.logos.prefix(3)))
+                }
                 
-                reviewsView
+                if !viewModel.reviews.isEmpty {
+                    reviewsView
+                }
             }
         }
     }
@@ -128,6 +137,7 @@ private extension FilmDetailsView {
                         .clipShape(Circle())
                 } else {
                     Image(systemName: "person.circle")
+                        .foregroundStyle(.profileAvatarBlue)
                         .font(.system(size: 40))
                         .frame(width: 50, height: 50)
                         .scaledToFill()
@@ -152,12 +162,13 @@ private extension FilmDetailsView {
             
             Spacer()
         }
-        .frame(width: 300, height: 130)
+        .frame(width: 300, height: 200)
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 20)
                 .foregroundStyle(.inputSectionGray)
         }
+        .padding(.bottom, 25)
     }
 }
 
@@ -171,6 +182,13 @@ private extension FilmDetailsView {
                 HStack(spacing: 10) {
                     ForEach(media, id: \.self) { image in
                         KFImage(image.url)
+                            .placeholder {
+                                ZStack {
+                                    Color.gray.opacity(0.2)
+                                    ProgressView()
+                                        .controlSize(.large) 
+                                }
+                            }
                             .resizable()
                             .aspectRatio(image.aspectRation, contentMode: .fit)
                             .frame(height: 200)
@@ -274,7 +292,8 @@ private extension FilmDetailsView {
                     .font(.system(size: 27, weight: .medium))
             }
             .foregroundStyle(.yellow)
-            .padding(7)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 10)
             .background {
                 Capsule()
                     .foregroundStyle(.yellow.opacity(0.6))

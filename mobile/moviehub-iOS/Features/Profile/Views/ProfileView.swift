@@ -42,6 +42,9 @@ struct ProfileView: View {
                 }
             }
         }
+        .onAppear {
+            viewModel.updateStats()
+        }
     }
     
     var achievements: some View {
@@ -102,12 +105,12 @@ struct ProfileView: View {
             
             HStack(spacing: 12) {
                 statisticsView(caption: "Просмотрено") {
-                    Text("0")
+                    Text("\(viewModel.stats.viewed)")
                         .font(.system(size: 25, weight: .semibold))
                 }
                 
                 statisticsView(caption: "Хочу") {
-                    Text("0")
+                    Text("\(viewModel.stats.liked)")
                         .font(.system(size: 25, weight: .semibold))
                 }
                 
@@ -117,7 +120,7 @@ struct ProfileView: View {
                             .font(.system(size: 27))
                             .foregroundStyle(.yellow)
                         
-                        Text("0")
+                        Text("8.6")
                             .font(.system(size: 25, weight: .semibold))
                     }
                 }
@@ -152,10 +155,10 @@ struct ProfileView: View {
             avatarView
             
             VStack(alignment: .leading, spacing: 10) {
-                Text(viewModel.userModel?.name ?? "Имя пользователя")
+                Text(viewModel.userModel?.name ?? "playerz0redd")
                     .font(.system(size: 25, weight: .semibold))
                 
-                Text(viewModel.userModel?.email ?? "Почта")
+                Text(viewModel.userModel?.email ?? "ipasha1337@yandex.by")
                     .font(.system(size: 19, weight: .regular))
                     .foregroundStyle(.gray)
             }

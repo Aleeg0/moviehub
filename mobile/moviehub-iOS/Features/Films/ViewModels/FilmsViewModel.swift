@@ -80,7 +80,15 @@ final class FilmsViewModel: ObservableObject {
     }
     
     func handleButton(type: ActionButton) {
-        films.removeFirst()
+        let status: SwipeStatus = switch type {
+        case .dontWant:
+                .disliked
+        case .watched:
+                .viewed
+        case .want:
+                .liked
+        }
+        onSwipe(status: status)
     }
     
 }
