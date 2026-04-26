@@ -49,7 +49,7 @@ extension Tabs {
         case .main:
             FilmStackView()
         case .lists:
-            Text("LISTS")
+            MovieListFlowView()
         }
     }
 }

@@ -47,7 +47,7 @@ struct DecodeManager: IDecodeManager {
         self.decoder = decoder
         
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .formatted(formatter)
+        encoder.dateEncodingStrategy = .formatted(fullFormatter)
         self.encoder = encoder
     }
     

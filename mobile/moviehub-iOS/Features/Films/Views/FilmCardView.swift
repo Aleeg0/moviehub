@@ -14,13 +14,12 @@ struct FilmCardView: View {
     private let film: FilmModel
     private let onSwipe: (FilmsViewModel.SwipeStatus) -> Void
     private let genres: String
-    private let onSwipe: () -> Void
     private let onOpenDescription: (Int) -> Void
     
     @State private var offset: CGSize = .zero
     @State private var angle: CGFloat = .zero
     
-    init(film: FilmModel, genres: String, onSwipe: @escaping (FilmsViewModel.SwipeStatus) -> Void) {
+    init(film: FilmModel, genres: String, onSwipe: @escaping (FilmsViewModel.SwipeStatus) -> Void, onOpenDescription: @escaping (Int) -> Void) {
         self.film = film
         self.genres = genres
         self.onSwipe = onSwipe
@@ -42,6 +41,13 @@ struct FilmCardView: View {
     
     func imageView(imagePath: String) -> some View {
         KFImage(URL(string: imagePath))
+            .placeholder {
+                ZStack {
+                    Color.gray.opacity(0.2)
+                    ProgressView()
+                        .controlSize(.large)
+                }
+            }
             .resizable()
             .scaledToFill()
             .frame(width: 350, height: 500)

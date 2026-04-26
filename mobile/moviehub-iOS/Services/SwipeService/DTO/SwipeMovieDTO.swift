@@ -18,6 +18,7 @@ struct SwipeMovieDTO: Encodable {
         let posterPath: String
         let releaseDate: Date
         let voteAverage: Double
+        let genreId: Int?
         
         enum CodingKeys: String, CodingKey {
             case externalId = "external_id"
@@ -25,6 +26,7 @@ struct SwipeMovieDTO: Encodable {
             case posterPath = "poster_path"
             case releaseDate = "release_date"
             case voteAverage = "vote_average"
+            case genreId = "genre_id"
         }
     }
     
@@ -42,7 +44,7 @@ struct SwipeMovieDTO: Encodable {
 extension SwipeMovieDTO {
     init(from movie: FilmModel, status: FilmsViewModel.SwipeStatus) {
         self.action = .movie
-        self.movie = .init(externalId: movie.id, title: movie.title, posterPath: movie.image ?? "", releaseDate: movie.releaseDate, voteAverage: movie.rating)
+        self.movie = .init(externalId: movie.id, title: movie.title, posterPath: movie.image ?? "", releaseDate: movie.releaseDate, voteAverage: movie.rating, genreId: movie.genres.first)
         
         self.status = switch status {
         case .liked:      .liked

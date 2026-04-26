@@ -32,9 +32,9 @@ enum SwipeServiceEndpoints: IEndpoint {
     var url: URL? {
         var components: URLComponents? = .init(string: startUrl)
         var queryItems: [URLQueryItem] = []
-        
         switch self {
         case .websocketMovieTracking(let refreshToken):
+            print(refreshToken)
             queryItems.append(.init(name: "token", value: refreshToken))
         }
         
