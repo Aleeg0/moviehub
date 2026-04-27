@@ -19,7 +19,7 @@ enum AuthEndpoints: IEndpoint {
     
     private static let BASE_URL = "http://localhost:"
     private static let BASE_PORT = 8000
-    private static let API_PREFIX = "api/v1/users/"
+    private static let API_PREFIX = "api/v1/auth/"
     
     private var urlStart: String {
         Self.BASE_URL + String(Self.BASE_PORT) + "/" + Self.API_PREFIX
