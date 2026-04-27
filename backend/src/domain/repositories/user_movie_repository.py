@@ -1,10 +1,10 @@
 from typing import cast
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.errors import ResourceAlreadyExistsError
+from src.core.errors import ResourceAlreadyExistsError, ResourceNotFoundError
 from src.domain.models import UserMovie, Movie, UserMovieStatus
 
 
@@ -43,3 +43,20 @@ class UserMovieRepository:
 
         result = await self._session.execute(stmt)
         return cast(list[tuple[UserMovieStatus, int]], result.tuples().all())
+
+    async def update_user_movie(self, user_id: int, movie_id: int, updated_field: dict) -> UserMovie:
+        stmt = (
+            update(UserMovie)
+            .where(
+                UserMovie.user_id == user_id,
+                UserMovie.movie_id == movie_id
+            )
+            .values(**updated_field)
+            .returning(UserMovie)
+        )
+        result = await self._session.scalar(stmt)
+        if result is None:
+            raise ResourceNotFoundError(f"UserMovie with user_id {user_id} not found")
+
+        await self._session.flush()
+        return result
