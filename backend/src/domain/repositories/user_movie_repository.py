@@ -22,16 +22,17 @@ class UserMovieRepository:
 
         return user_movie
 
-    async def get_user_movies_by_user_id(self, user_id: int) -> list[tuple[UserMovieStatus, Movie]]:
+    async def get_user_movies_by_user_id(self, user_id: int) -> list[tuple[UserMovie, Movie]]:
         stmt = (
-            select(UserMovie.status, Movie)
+            select(UserMovie, Movie)
             .join(Movie, UserMovie.movie_id == Movie.id)
             .where(UserMovie.user_id == user_id)
+            .order_by(UserMovie.created_at.desc())
         )
 
         result = await self._session.execute(stmt)
 
-        return cast(list[tuple[UserMovieStatus, Movie]], result.tuples().all())
+        return cast(list[tuple[UserMovie, Movie]], result.tuples().all())
 
     async def get_user_movie_statistics_by_user_id(self, user_id: int) -> list[tuple[UserMovieStatus, int]]:
         stmt = (

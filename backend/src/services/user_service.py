@@ -40,9 +40,10 @@ class UserService:
                     poster_path=movie.poster_path,
                     genre_id=movie.genre_id,
                     vote_average=movie.vote_average,
-                    status=status
+                    status=user_movie.status,
+                    created_at=user_movie.created_at
                 )
-                for status, movie in user_movies
+                for user_movie, movie in user_movies
             ]
         )
 

@@ -1,6 +1,7 @@
+from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.database import Base
@@ -21,3 +22,5 @@ class UserMovie(Base):
         ForeignKey("movies.id", ondelete="CASCADE"), primary_key=True
     )
     status: Mapped[UserMovieStatus] = mapped_column(nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())

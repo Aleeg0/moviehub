@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from src.domain.models import UserMovieStatus
 from .base import BaseSchema
@@ -25,6 +25,7 @@ class GetUserMovieResponse(BaseSchema):
     vote_average: float
     genre_id: int | None = None
     status: UserMovieStatus
+    created_at: datetime
 
 class GetUserMoviesResponse(BaseSchema):
     movies: list[GetUserMovieResponse]
