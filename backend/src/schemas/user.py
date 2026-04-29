@@ -36,6 +36,8 @@ class GetUserMovieResponse(BaseSchema):
     genre_id: int | None = None
     status: UserMovieStatus
     created_at: datetime
+    rating: Rating | None = None
+    comment: Comment | None = None
 
 class GetUserMoviesResponse(BaseSchema):
     movies: list[GetUserMovieResponse]

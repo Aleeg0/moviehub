@@ -42,7 +42,9 @@ class UserService:
                     genre_id=movie.genre_id,
                     vote_average=movie.vote_average,
                     status=user_movie.status,
-                    created_at=user_movie.created_at
+                    created_at=user_movie.created_at,
+                    rating=user_movie.rating,
+                    comment=user_movie.comment,
                 )
                 for user_movie, movie in user_movies
             ]
