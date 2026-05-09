@@ -64,3 +64,7 @@ class UpdateUserMovieResponse(BaseSchema):
     status: UserMovieStatus
     rating: Rating | None = None
     comment: Comment | None = None
+
+class DeleteUserMovieRequest(BaseSchema):
+    user_id: int
+    movie_id: int

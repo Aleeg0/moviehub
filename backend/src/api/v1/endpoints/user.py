@@ -1,11 +1,9 @@
-from http import HTTPStatus
-
 from fastapi import APIRouter, Depends
 from starlette import status
 
 from src.schemas import GetUserMoviesStatisticRequest, UpdateUserMovieResponse, UpdateUserMovieRequest
 from src.schemas.user import GetUserMoviesResponse, GetUserMoviesRequest, GetUserMoviesStatisticResponse, \
-    PatchUserMovieRatingBody
+    PatchUserMovieRatingBody, DeleteUserMovieRequest
 from src.services import UserService
 from src.services.deps import get_user_service
 from ..deps import get_user_id_http
@@ -46,5 +44,22 @@ async def patch_user_movie(
             status=request.status,
             rating=request.rating,
             comment=request.comment,
+        )
+    )
+
+@router.delete(
+    "/movies/{movie_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_user_movie(
+    movie_id: int,
+    user_id: int = Depends(get_user_id_http),
+    service: UserService = Depends(get_user_service)
+):
+    await service.delete_user_movie(
+        DeleteUserMovieRequest(
+            movie_id=movie_id,
+            user_id=user_id
         )
     )

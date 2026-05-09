@@ -1,6 +1,6 @@
 from typing import cast
 
-from sqlalchemy import select, func, update
+from sqlalchemy import select, func, update, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -60,3 +60,10 @@ class UserMovieRepository:
 
         await self._session.flush()
         return result
+
+    async def delete(self, user_id: int, movie_id: int) -> None:
+        user_movie = await self._session.get(UserMovie, (user_id, movie_id))
+
+        if user_movie:
+            await self._session.delete(user_movie)
+            await self._session.flush()

@@ -1,7 +1,7 @@
 from src.domain.models import UserMovie, UserMovieStatus
 from src.schemas import CreateUserMovieRequest, CreateUserMovieResponse, GetUserMoviesRequest, GetUserMoviesResponse, \
     GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest, UpdateUserMovieRequest, \
-    UpdateUserMovieResponse
+    UpdateUserMovieResponse, DeleteUserMovieRequest
 from ..domain.repositories import UnitOfWork, UserMovieRepository
 
 
@@ -82,3 +82,8 @@ class UserService:
             await self.uow.commit()
 
         return UpdateUserMovieResponse.model_validate(user_movie)
+
+    async def delete_user_movie(self, request: DeleteUserMovieRequest) -> None:
+        async with self.uow:
+            await self.user_movie_repo.delete(request.user_id, request.movie_id)
+            await self.uow.commit()
