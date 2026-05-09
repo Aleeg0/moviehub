@@ -26,13 +26,31 @@ struct ListView: View {
                 Text("Оценивай фильмы на главном экране")
             }
         } else {
-            ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 10) {
+            List {
+                //LazyVStack(spacing: 10) {
                     ForEach(movies, id: \.self) { movie in
                         movieView(movie: movie)
+                            .listRowSeparator(.hidden)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(action: {}) {
+                                    VStack {
+                                        Image(systemName: "star")
+                                        Text("Звезда")
+                                    }
+                                }
+                                .tint(.orange)
+                                Button(action: {}) {
+                                    VStack {
+                                        Image(systemName: "star")
+                                        Text("Звезда")
+                                    }
+                                }
+                            }
                     }
-                }
+                //}
             }
+            .listStyle(.plain)
+            .listRowSeparator(.hidden)
             .contentMargins(.bottom, 70, for: .scrollContent)
         }
     }
