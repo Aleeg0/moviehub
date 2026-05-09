@@ -19,6 +19,8 @@ class UserService:
             user_id = request.user_id,
             movie_id = request.movie_id,
             status = request.status,
+            rating = request.rating,
+            comment = request.comment,
         )
 
         async with self.uow:

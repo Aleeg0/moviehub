@@ -6,6 +6,7 @@ from pydantic import Field
 from src.domain.models import UserMovieStatus
 from src.schemas.base import BaseSchema
 from src.schemas.movie import UpsertMovieRequest
+from src.schemas.user import Rating, Comment
 
 
 # Enums
@@ -29,6 +30,8 @@ class SeenMovieMsg(BaseSchema):
     action: Literal[ActionType.MOVIE] = ActionType.MOVIE
     movie: UpsertMovieRequest
     status: UserMovieStatus
+    rating: Rating | None = None
+    comment: Comment | None = None
 
 WSMsg = Annotated[
     Union[PingMsg, SeenMovieMsg],
@@ -47,3 +50,5 @@ class HandleSeenMovieRequest(BaseSchema):
     user_id: int
     movie: UpsertMovieRequest
     status: UserMovieStatus
+    rating: Rating | None = None
+    comment: Comment | None = None

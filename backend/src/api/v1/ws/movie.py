@@ -35,7 +35,9 @@ async def movie_tracking(
                             HandleSeenMovieRequest(
                                 user_id=user_id,
                                 movie=msg.movie,
-                                status=msg.status
+                                status=msg.status,
+                                rating=msg.rating,
+                                comment=msg.comment,
                             )
                         )
                     case _:
