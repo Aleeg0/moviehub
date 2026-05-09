@@ -11,7 +11,8 @@ Comment = Annotated[str, Field(min_length=1, max_length=120)]
 
 # Request
 class PatchUserMovieRatingBody(BaseSchema):
-    rating: Rating
+    status: UserMovieStatus | None
+    rating: Rating | None = None
     comment: Comment | None = None
 
 # Service
@@ -19,6 +20,8 @@ class CreateUserMovieRequest(BaseSchema):
     user_id: int
     movie_id: int
     status: UserMovieStatus
+    rating: Rating | None = None
+    comment: Comment | None = None
 
 class CreateUserMovieResponse(CreateUserMovieRequest):
     pass
@@ -50,16 +53,14 @@ class GetUserMoviesStatisticResponse(BaseSchema):
     disliked: int
     viewed: int
 
-class UpdateUserMovieRatingRequest(BaseSchema):
+class UpdateUserMovieRequest(PatchUserMovieRatingBody):
     user_id: int
     movie_id: int
-    rating: Rating
-    comment: Comment | None = None
 
-class UpdateUserMovieRatingResponse(BaseSchema):
+class UpdateUserMovieResponse(BaseSchema):
     user_id: int
     movie_id: int
-    status: UserMovieStatus
-    rating: Rating
     created_at: datetime
+    status: UserMovieStatus
+    rating: Rating | None = None
     comment: Comment | None = None

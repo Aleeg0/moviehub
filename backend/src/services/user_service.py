@@ -1,7 +1,7 @@
 from src.domain.models import UserMovie, UserMovieStatus
 from src.schemas import CreateUserMovieRequest, CreateUserMovieResponse, GetUserMoviesRequest, GetUserMoviesResponse, \
-    GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest, UpdateUserMovieRatingRequest, \
-    UpdateUserMovieRatingResponse
+    GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest, UpdateUserMovieRequest, \
+    UpdateUserMovieResponse
 from ..domain.repositories import UnitOfWork, UserMovieRepository
 
 
@@ -64,13 +64,21 @@ class UserService:
             viewed=counts.get(UserMovieStatus.VIEWED, 0),
         )
 
-    async def update_user_movie(self, request: UpdateUserMovieRatingRequest) -> UpdateUserMovieRatingResponse:
+    async def update_user_movie(self, request: UpdateUserMovieRequest) -> UpdateUserMovieResponse:
+        updated_fields = request.model_dump(exclude={"user_id", "movie_id"}, exclude_none=True)
+
+        if updated_fields.get("status") != UserMovieStatus.VIEWED:
+            updated_fields.update({
+                "rating": None,
+                "comment": None
+            })
+
         async with self.uow:
             user_movie = await self.user_movie_repo.update_user_movie(
                 user_id=request.user_id,
                 movie_id=request.movie_id,
-                updated_field=request.model_dump(exclude={"user_id", "movie_id"}),
+                updated_field=updated_fields,
             )
             await self.uow.commit()
 
-        return UpdateUserMovieRatingResponse.model_validate(user_movie)
+        return UpdateUserMovieResponse.model_validate(user_movie)

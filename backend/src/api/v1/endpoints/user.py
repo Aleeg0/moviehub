@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from src.schemas import GetUserMoviesStatisticRequest, UpdateUserMovieRatingResponse, UpdateUserMovieRatingRequest
+from src.schemas import GetUserMoviesStatisticRequest, UpdateUserMovieResponse, UpdateUserMovieRequest
 from src.schemas.user import GetUserMoviesResponse, GetUserMoviesRequest, GetUserMoviesStatisticResponse, \
     PatchUserMovieRatingBody
 from src.services import UserService
@@ -30,7 +30,7 @@ async def get_user_movies_statistic(user_id: int = Depends(get_user_id_http), se
 
 @router.patch(
     "/movies/{movie_id}",
-    response_model=UpdateUserMovieRatingResponse,
+    response_model=UpdateUserMovieResponse,
     status_code=status.HTTP_200_OK
 )
 async def patch_user_movie(
@@ -40,10 +40,11 @@ async def patch_user_movie(
     service: UserService = Depends(get_user_service),
 ):
     return await service.update_user_movie(
-        UpdateUserMovieRatingRequest(
+        UpdateUserMovieRequest(
             movie_id=movie_id,
             user_id=user_id,
+            status=request.status,
             rating=request.rating,
-            comment=request.comment
+            comment=request.comment,
         )
     )
