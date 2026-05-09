@@ -1,6 +1,7 @@
 from src.domain.models import UserMovie, UserMovieStatus
 from src.schemas import CreateUserMovieRequest, CreateUserMovieResponse, GetUserMoviesRequest, GetUserMoviesResponse, \
-    GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest
+    GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest, UpdateUserMovieRequest, \
+    UpdateUserMovieResponse, DeleteUserMovieRequest
 from ..domain.repositories import UnitOfWork, UserMovieRepository
 
 
@@ -18,6 +19,8 @@ class UserService:
             user_id = request.user_id,
             movie_id = request.movie_id,
             status = request.status,
+            rating = request.rating,
+            comment = request.comment,
         )
 
         async with self.uow:
@@ -40,9 +43,12 @@ class UserService:
                     poster_path=movie.poster_path,
                     genre_id=movie.genre_id,
                     vote_average=movie.vote_average,
-                    status=status
+                    status=user_movie.status,
+                    created_at=user_movie.created_at,
+                    rating=user_movie.rating,
+                    comment=user_movie.comment,
                 )
-                for status, movie in user_movies
+                for user_movie, movie in user_movies
             ]
         )
 
@@ -57,3 +63,27 @@ class UserService:
             disliked=counts.get(UserMovieStatus.DISLIKED, 0),
             viewed=counts.get(UserMovieStatus.VIEWED, 0),
         )
+
+    async def update_user_movie(self, request: UpdateUserMovieRequest) -> UpdateUserMovieResponse:
+        updated_fields = request.model_dump(exclude={"user_id", "movie_id"}, exclude_none=True)
+
+        if updated_fields.get("status") != UserMovieStatus.VIEWED:
+            updated_fields.update({
+                "rating": None,
+                "comment": None
+            })
+
+        async with self.uow:
+            user_movie = await self.user_movie_repo.update_user_movie(
+                user_id=request.user_id,
+                movie_id=request.movie_id,
+                updated_field=updated_fields,
+            )
+            await self.uow.commit()
+
+        return UpdateUserMovieResponse.model_validate(user_movie)
+
+    async def delete_user_movie(self, request: DeleteUserMovieRequest) -> None:
+        async with self.uow:
+            await self.user_movie_repo.delete(request.user_id, request.movie_id)
+            await self.uow.commit()

@@ -8,7 +8,7 @@
 import Foundation
 
 protocol SwipeServiceProtocol {
-    func sendMovieInfo(movie: FilmModel, status: FilmsViewModel.SwipeStatus)
+    func sendMovieInfo(movie: FilmModel, status: FilmsViewModel.SwipeStatus, rating: Int?, comment: String?)
     func connect()
 }
 
@@ -24,8 +24,8 @@ final class SwipeService: SwipeServiceProtocol {
         self.decoder = dependency.decoder
     }
     
-    func sendMovieInfo(movie: FilmModel, status: FilmsViewModel.SwipeStatus) {
-        let dto = SwipeMovieDTO(from: movie, status: status)
+    func sendMovieInfo(movie: FilmModel, status: FilmsViewModel.SwipeStatus, rating: Int? = nil, comment: String? = nil) {
+        let dto = SwipeMovieDTO(from: movie, status: status, comment: comment, rating: rating)
         let data = decoder.encode(data: dto)
         
         networkManager.sendWithWebsocket(data: data)

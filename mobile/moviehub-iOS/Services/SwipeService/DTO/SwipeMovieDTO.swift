@@ -11,6 +11,8 @@ struct SwipeMovieDTO: Encodable {
     let action: Action
     let movie: MovieDTO
     let status: Status
+    let rating: Int?
+    let comment: String?
     
     struct MovieDTO: Encodable {
         let externalId: Int
@@ -42,7 +44,7 @@ struct SwipeMovieDTO: Encodable {
 }
 
 extension SwipeMovieDTO {
-    init(from movie: FilmModel, status: FilmsViewModel.SwipeStatus) {
+    init(from movie: FilmModel, status: FilmsViewModel.SwipeStatus, comment: String? = nil, rating: Int? = nil) {
         self.action = .movie
         self.movie = .init(externalId: movie.id, title: movie.title, posterPath: movie.image ?? "", releaseDate: movie.releaseDate, voteAverage: movie.rating, genreId: movie.genres.first)
         
@@ -51,5 +53,7 @@ extension SwipeMovieDTO {
         case .disliked:   .disliked
         case .viewed:     .viewed
         }
+        self.rating = rating
+        self.comment = comment
     }
 }

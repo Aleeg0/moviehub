@@ -14,6 +14,9 @@ final class FilmsViewModel: ObservableObject {
     @Published var genres: [Int : String] = [:]
     @Published var isShowingDetails = false
     @Published var selectedFilmId: Int?
+    @Published var selectedStarsCount = 0
+    @Published var isShowingRateView = false
+    @Published var noteString: String = ""
     
     
     private let filmsProvider: IFilmsProvider
@@ -58,9 +61,28 @@ final class FilmsViewModel: ObservableObject {
         }
     }
     
+    func sendViewedMovie() {
+        guard let movie = films.first else { return }
+        self.swipeService.sendMovieInfo(movie: movie, status: .viewed, rating: selectedStarsCount == 0 ? nil : selectedStarsCount, comment: noteString.isEmpty ? nil : noteString)
+        self.films.removeFirst()
+        clearRating()
+        self.fetchFilms()
+        
+    }
+    
+    private func clearRating() {
+        noteString = ""
+        selectedStarsCount = 0
+        isShowingRateView = false
+    }
+    
     func onSwipe(status: SwipeStatus) {
         guard let movie = films.first else { return }
-        self.swipeService.sendMovieInfo(movie: movie, status: status)
+        if status == .viewed {
+            isShowingRateView = true
+            return
+        }
+        self.swipeService.sendMovieInfo(movie: movie, status: status, rating: nil, comment: nil)
         self.films.removeFirst()
         self.fetchFilms()
     }

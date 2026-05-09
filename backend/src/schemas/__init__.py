@@ -8,6 +8,8 @@ from .user import (
     CreateUserMovieRequest, CreateUserMovieResponse,
     GetUserMoviesRequest, GetUserMoviesResponse,
     GetUserMovieResponse, GetUserMoviesStatisticRequest,
-    GetUserMoviesStatisticResponse
+    GetUserMoviesStatisticResponse,
+    UpdateUserMovieRequest, UpdateUserMovieResponse, PatchUserMovieRatingBody,
+    DeleteUserMovieRequest
 )
 from .ws import PingMsg, SeenMovieMsg, ActionType, HandleSeenMovieRequest, WSMsg, WSStatus, WSRes

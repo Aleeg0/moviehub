@@ -1,4 +1,5 @@
 from src.core.errors import ResourceAlreadyExistsError
+from src.domain.models import UserMovieStatus
 from src.schemas import HandleSeenMovieRequest, WSRes, WSStatus, UpsertMovieRequest, CreateUserMovieRequest
 from src.services import UserService, MovieService
 
@@ -22,8 +23,13 @@ class WSService:
             row_view_movie = CreateUserMovieRequest(
                 user_id=payload.user_id,
                 movie_id=movie.id,
-                status=payload.status,
+                status=payload.status
             )
+
+            if row_view_movie.status == UserMovieStatus.VIEWED:
+                row_view_movie.rating = payload.rating
+                row_view_movie.comment = payload.comment
+
             await self.user_service.create_user_movie(row_view_movie)
         except ResourceAlreadyExistsError as e:
             return WSRes(

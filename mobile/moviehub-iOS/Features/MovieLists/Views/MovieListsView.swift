@@ -20,30 +20,30 @@ struct MovieListsView: View {
             
             tabView
                 //.padding(.horizontal, 20)
-            
-            GeometryReader { geo in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 0) {
-                        ForEach(MovieListsViewModel.Tabs.allCases, id: \.self) { tab in
-                            ListView(movies: viewModel.films.filter({ movie in
-                                switch tab {
-                                case .liked:         movie.status == .liked && movie.genreId != nil
-                                case .disliked:      movie.status == .disliked && movie.genreId != nil
-                                case .watched:        movie.status == .viewed && movie.genreId != nil
-                                }
-                            }), genres: viewModel.genres)
-                                .padding(10)
-                                .frame(width: geo.size.width)
-                                .id(tab)
-                                .tag(tab)
-                        }
-                        
-                    }
-                    .scrollTargetLayout()
-                }
-                .scrollTargetBehavior(.paging)
-                .scrollPosition(id: createScrollPositionBinding())
-            }
+            ListView(movies: viewModel.films, genres: [:])
+//            GeometryReader { geo in
+//                ScrollView(.horizontal, showsIndicators: false) {
+//                    HStack(spacing: 0) {
+//                        ForEach(MovieListsViewModel.Tabs.allCases, id: \.self) { tab in
+//                            ListView(movies: viewModel.films.filter({ movie in
+//                                switch tab {
+//                                case .liked:         movie.status == .liked && movie.genreId != nil
+//                                case .disliked:      movie.status == .disliked && movie.genreId != nil
+//                                case .watched:        movie.status == .viewed && movie.genreId != nil
+//                                }
+//                            }), genres: viewModel.genres)
+//                                .padding(10)
+//                                .frame(width: geo.size.width)
+//                                .id(tab)
+//                                .tag(tab)
+//                        }
+//                        
+//                    }
+//                    .scrollTargetLayout()
+//                }
+//                .scrollTargetBehavior(.paging)
+//                .scrollPosition(id: createScrollPositionBinding())
+//            }
         }
         .animation(.easeInOut, value: viewModel.films)
         .ignoresSafeArea(edges: .bottom)

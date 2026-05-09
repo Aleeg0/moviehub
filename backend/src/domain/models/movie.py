@@ -16,11 +16,11 @@ class Movie(Base):
     genre_id: Mapped[int] = mapped_column(Integer, nullable=True)
     poster_path: Mapped[str] = mapped_column(String, nullable=False)
     release_date: Mapped[date] = mapped_column(Date, nullable=False)
-    vote_average: Mapped[float] = mapped_column(
-        Numeric(3, 1),
+    vote_average: Mapped[float] = mapped_column(Numeric(3, 1),nullable=False)
+
+    __table_args__ = (
         CheckConstraint(
             "vote_average >= 0.0 AND vote_average <= 10.0",
-            name="vote_average_check_range"
+            name="ck_movies_vote_average_range"
         ),
-        nullable=False
     )
