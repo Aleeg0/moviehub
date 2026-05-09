@@ -3,3 +3,4 @@ from .token_repository import TokenRepository
 from .unit_of_work import UnitOfWork
 from .user_movie_repository import UserMovieRepository
 from .user_repository import UserRepository
+from .user_movie_service_repository import UserMovieServiceRepository

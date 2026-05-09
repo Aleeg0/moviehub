@@ -1,8 +1,9 @@
 from src.domain.models import UserMovie, UserMovieStatus
 from src.schemas import CreateUserMovieRequest, CreateUserMovieResponse, GetUserMoviesRequest, GetUserMoviesResponse, \
     GetUserMovieResponse, GetUserMoviesStatisticResponse, GetUserMoviesStatisticRequest, UpdateUserMovieRequest, \
-    UpdateUserMovieResponse, DeleteUserMovieRequest
-from ..domain.repositories import UnitOfWork, UserMovieRepository
+    UpdateUserMovieResponse, DeleteUserMovieRequest, GetUserMovieServicesRequest, GetUserMovieServicesResponse, \
+    UpsertUserMovieServicesRequest
+from src.domain.repositories import UnitOfWork, UserMovieRepository, UserMovieServiceRepository
 
 
 class UserService:
@@ -10,9 +11,11 @@ class UserService:
         self,
         uow: UnitOfWork,
         user_movie_repo: UserMovieRepository,
+        user_movie_service_repo: UserMovieServiceRepository
     ):
         self.uow = uow
         self.user_movie_repo = user_movie_repo
+        self.user_movie_service_repo = user_movie_service_repo
 
     async def create_user_movie(self, request: CreateUserMovieRequest) -> CreateUserMovieResponse:
         user_movie = UserMovie(
@@ -86,4 +89,15 @@ class UserService:
     async def delete_user_movie(self, request: DeleteUserMovieRequest) -> None:
         async with self.uow:
             await self.user_movie_repo.delete(request.user_id, request.movie_id)
+            await self.uow.commit()
+
+    async def get_user_movie_services(self, request: GetUserMovieServicesRequest) -> GetUserMovieServicesResponse:
+        user_movie_services = await self.user_movie_service_repo.get_user_movie_services_by_id(request.user_id)
+        return GetUserMovieServicesResponse(
+            movie_ids=[user_movie_service.movie_service_id for user_movie_service in user_movie_services]
+        )
+
+    async def upsert_user_movie_services(self, request: UpsertUserMovieServicesRequest) -> None:
+        async with self.uow:
+            await self.user_movie_service_repo.upsert_user_movie_services(request.user_id, request.movie_ids)
             await self.uow.commit()

@@ -2,7 +2,8 @@ from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core import get_db
-from src.domain.repositories import TokenRepository, UnitOfWork, UserRepository, MovieRepository, UserMovieRepository
+from src.domain.repositories import TokenRepository, UnitOfWork, UserRepository, MovieRepository, UserMovieRepository, \
+    UserMovieServiceRepository
 
 
 def get_unit_of_work(session: AsyncSession = Depends(get_db)) -> UnitOfWork:
@@ -19,3 +20,6 @@ def get_movie_repository(session: AsyncSession = Depends(get_db)) -> MovieReposi
 
 def get_user_movie_repository(session: AsyncSession = Depends(get_db)) -> UserMovieRepository:
     return UserMovieRepository(session=session)
+
+def get_user_movie_service_repository(session: AsyncSession = Depends(get_db)) -> UserMovieServiceRepository:
+    return UserMovieServiceRepository(session=session)
