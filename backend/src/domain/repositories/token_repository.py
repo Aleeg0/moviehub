@@ -9,21 +9,7 @@ class TokenRepository:
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_by_user_id(self, user_id: int) -> RefreshToken | None:
-        stmt = (
-            select(RefreshToken)
-            .where(RefreshToken.user_id == user_id)
-        )
-        result = await self._session.execute(stmt)
-        return result.scalar_one_or_none()
-
-    async def delete(self, user_id: int) -> bool:
-        stmt = delete(RefreshToken).where(RefreshToken.user_id == user_id)
-        await self._session.execute(stmt)
-        await self._session.flush()
-        return True
-
-    async def upsert(self, token: str, user_id: int):
+    async def upsert(self, token: str, user_id: int) -> RefreshToken:
         stmt = (
             insert(RefreshToken)
             .values(token=token, user_id=user_id)
@@ -36,5 +22,20 @@ class TokenRepository:
 
 
         result = await self._session.scalar(stmt)
+        await self._session.refresh(result)
         await self._session.flush()
         return result
+
+    async def get_by_user_id(self, user_id: int) -> RefreshToken | None:
+        stmt = (
+            select(RefreshToken)
+            .where(RefreshToken.user_id == user_id)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def delete_by_user_id(self, user_id: int) -> bool:
+        stmt = delete(RefreshToken).where(RefreshToken.user_id == user_id)
+        await self._session.execute(stmt)
+        await self._session.flush()
+        return True
