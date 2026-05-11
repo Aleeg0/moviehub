@@ -56,7 +56,7 @@ private extension ForgotPasswordView {
                 .frame(width: 80, height: 80)
                 .foregroundStyle(.authBlueTop)
             
-            AuthActionButton(caption: "Continue", action: viewModel.onResetPasswordEnd)
+            AuthActionButton(caption: "Continue", style: .authGradient, action: viewModel.onResetPasswordEnd)
         }
     }
 }
@@ -92,7 +92,7 @@ private extension ForgotPasswordView {
             .animation(.bouncy, value: viewModel.resetPasswordError)
             .animation(.bouncy, value: viewModel.resetPasswordValidationError as! [AuthValidationError])
             
-            AuthActionButton(caption: "Change password", action: viewModel.resetPassword)
+            AuthActionButton(caption: "Change password", style: .authGradient, action: viewModel.resetPassword)
             
         }
     }
@@ -227,7 +227,7 @@ private extension ForgotPasswordView {
                 }
             }
                 
-            AuthActionButton(caption: "Send code") {
+            AuthActionButton(caption: "Send code", style: .authGradient) {
                 viewModel.onOTPSend()
                 if viewModel.emailForResetError == nil {
                     hideKeyboard()

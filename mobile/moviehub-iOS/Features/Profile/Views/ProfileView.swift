@@ -19,9 +19,25 @@ struct ProfileView: View {
     }
     
     var body: some View {
+        ZStack {
+            if viewModel.isShowingProviderPicker {
+                ProvidersView(viewModel: .init(providerService: ProvidersService(networkManager: NetworkManager(), decoder: DecodeManager(), privateManager: UserDefaultsStorageManager()), dismiss: viewModel.cancelShowingProviderPicker))
+                    .transition(.scale)
+                    .toolbar(.hidden, for: .tabBar)
+            } else {
+                profileView
+                    .transition(.scale)
+            }
+        }
+        .animation(.linear, value: viewModel.isShowingProviderPicker)
+    }
+    
+    var profileView: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 infoBlock
+                
+                AuthActionButton(caption: "Добавить подписки", style: .authGradient, action: { viewModel.isShowingProviderPicker = true })
                 
                 achievementsSection
                 

@@ -10,6 +10,8 @@ import Foundation
 enum MovieListsEndpoints: IEndpoint {
     case allMovies
     case refreshTokens
+    case changeStatus(movieId: Int)
+    case deleteMovie(movieId: Int)
     
     private static let BASE_URL = "http://localhost:"
     private static let BASE_PORT = 8000
@@ -23,6 +25,8 @@ enum MovieListsEndpoints: IEndpoint {
         switch self {
         case .allMovies:        "users/movies"
         case .refreshTokens:    "auth/refresh"
+        case .changeStatus(let movieId):     "users/movies/\(movieId)"
+        case .deleteMovie(let movieId):      "users/movies/\(movieId)"
         }
     }
     
@@ -30,6 +34,8 @@ enum MovieListsEndpoints: IEndpoint {
         switch self {
         case .allMovies:        .get
         case .refreshTokens:    .post
+        case .changeStatus:     .patch
+        case .deleteMovie:      .delete
         }
     }
     

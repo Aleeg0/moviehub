@@ -8,13 +8,15 @@
 import Foundation
 import SwiftUI
 
-struct AuthActionButton: View {
+struct AuthActionButton<Style: ShapeStyle>: View {
     private let caption: LocalizedStringResource
     private let action: () -> Void
+    private let style: Style
     
-    init(caption: LocalizedStringResource, action: @escaping () -> Void) {
+    init(caption: LocalizedStringResource, style: Style, action: @escaping () -> Void) {
         self.action = action
         self.caption = caption
+        self.style = style
     }
     
     var body: some View {
@@ -24,7 +26,7 @@ struct AuthActionButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .font(.system(size: 20, weight: .semibold))
-                .background(Capsule().foregroundStyle(.authGradient))
+                .background(Capsule().foregroundStyle(style))
         }
     }
 }

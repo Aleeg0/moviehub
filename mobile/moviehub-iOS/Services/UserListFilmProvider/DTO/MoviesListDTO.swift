@@ -14,12 +14,15 @@ struct MoviesListDTO: Decodable {
     
     struct MovieDTO: Decodable {
         let id: Int
+        let apiId: Int
         let title: String
         let genreId: Int?
         let posterPath: String?
         let releaseDate: Date
         let voteAverage: Double
         let status: WatchStatus?
+        let rating: Int?
+        let comment: String?
         
         enum WatchStatus: String, Decodable {
             case liked
@@ -27,14 +30,17 @@ struct MoviesListDTO: Decodable {
             case viewed
         }
         
-        enum CodingKeys: CodingKey {
+        enum CodingKeys: String, CodingKey {
             case id
+            case apiId = "externalId"
             case title
             case genreId
             case posterPath
             case releaseDate
             case voteAverage
             case status
+            case rating
+            case comment
         }
     }
 }

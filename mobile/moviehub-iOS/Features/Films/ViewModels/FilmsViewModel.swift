@@ -17,17 +17,19 @@ final class FilmsViewModel: ObservableObject {
     @Published var selectedStarsCount = 0
     @Published var isShowingRateView = false
     @Published var noteString: String = ""
-    
+    @Published var userProviders: Set<Int>?
     
     private let filmsProvider: IFilmsProvider
     private let swipeService: SwipeServiceProtocol
+    private let providersService: ProvidersServiceProtocol
     
     private var page: Int
     
-    init(filmsProvider: IFilmsProvider, swipeService: SwipeServiceProtocol) {
+    init(filmsProvider: IFilmsProvider, swipeService: SwipeServiceProtocol, providerService: ProvidersServiceProtocol) {
         self.filmsProvider = filmsProvider
         self.swipeService = swipeService
-        self.page = Int.random(in: 1...100)
+        self.providersService = providerService
+        self.page = Int.random(in: 1...20)
         
         self.swipeService.connect()
         fetchGenres()
@@ -36,6 +38,17 @@ final class FilmsViewModel: ObservableObject {
     
     var visibleFilms: ArraySlice<FilmModel> {
         films.prefix(3)
+    }
+    
+    func fetchUsersProviders() {
+        Task {
+            let providers = try await providersService.fetchUsersProviders()
+            await MainActor.run {
+                if !providers.isEmpty {
+                    self.userProviders = providers
+                }
+            }
+        }
     }
     
     func showDetails(filmId: Int) {
@@ -50,6 +63,12 @@ final class FilmsViewModel: ObservableObject {
             .map({ genres[$0] ?? "No genre" })
             .prefix(2)
             .joined(separator: " / ") ?? ""
+    }
+    
+    func onDismiss() {
+        self.isShowingRateView = false
+        self.selectedStarsCount = 0
+        self.noteString = ""
     }
     
     private func fetchGenres() {
@@ -90,13 +109,13 @@ final class FilmsViewModel: ObservableObject {
     func fetchFilms() {
         guard self.films.count < 5 else { return }
 
-        let params: FilmsEndpoints.DiscoverMoviesParams = .init(language: .ru, page: page, sortBy: .popularity, includeAdult: true, watchRegion: nil, watchProviderIds: nil, genreIds: nil, runtimeGte: nil, runtimeLte: nil)
+        let params: FilmsEndpoints.DiscoverMoviesParams = .init(language: .ru, page: page, sortBy: .popularity, includeAdult: true, watchRegion: nil, watchProviderIds: userProviders, genreIds: nil, runtimeGte: nil, runtimeLte: nil)
         Task {
             let films = try await filmsProvider.fetchFilms(params: params)
             filmsProvider.prefetchImages(urls: films.compactMap( {URL(string: $0.image ?? "")} ))
             await MainActor.run {
                 self.films += films
-                self.page = Int.random(in: 1...100)
+                self.page = Int.random(in: 1...20)
             }
         }
     }

@@ -16,34 +16,19 @@ struct MovieListsView: View {
         VStack(spacing: 10) {
             
             headerView
-                //.padding(.horizontal, 20)
+                .padding(.horizontal, 8)
             
             tabView
-                //.padding(.horizontal, 20)
-            ListView(movies: viewModel.films, genres: [:])
-//            GeometryReader { geo in
-//                ScrollView(.horizontal, showsIndicators: false) {
-//                    HStack(spacing: 0) {
-//                        ForEach(MovieListsViewModel.Tabs.allCases, id: \.self) { tab in
-//                            ListView(movies: viewModel.films.filter({ movie in
-//                                switch tab {
-//                                case .liked:         movie.status == .liked && movie.genreId != nil
-//                                case .disliked:      movie.status == .disliked && movie.genreId != nil
-//                                case .watched:        movie.status == .viewed && movie.genreId != nil
-//                                }
-//                            }), genres: viewModel.genres)
-//                                .padding(10)
-//                                .frame(width: geo.size.width)
-//                                .id(tab)
-//                                .tag(tab)
-//                        }
-//                        
-//                    }
-//                    .scrollTargetLayout()
-//                }
-//                .scrollTargetBehavior(.paging)
-//                .scrollPosition(id: createScrollPositionBinding())
-//            }
+                .padding(.horizontal, 8)
+            
+            switch viewModel.selectedTab {
+            case .liked:
+                ListView(viewModel: viewModel, movies: viewModel.films.filter({ $0.status == .liked && $0.genreId != nil }), genres: viewModel.genres, tab: viewModel.selectedTab)
+            case .disliked:
+                ListView(viewModel: viewModel, movies: viewModel.films.filter({ $0.status == .disliked && $0.genreId != nil }), genres: viewModel.genres, tab: viewModel.selectedTab)
+            case .watched:
+                ListView(viewModel: viewModel, movies: viewModel.films.filter({ $0.status == .viewed && $0.genreId != nil }), genres: viewModel.genres, tab: viewModel.selectedTab)
+            }
         }
         .animation(.easeInOut, value: viewModel.films)
         .ignoresSafeArea(edges: .bottom)
@@ -52,6 +37,16 @@ struct MovieListsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.fetchFilms()
+        }
+        .scaleEffect(viewModel.isShowingRatingView ? 0.95 : 1)
+        .blur(radius: viewModel.isShowingRatingView ? 20 : 0)
+        .animation(.bouncy, value: viewModel.isShowingRatingView)
+        .overlay {
+            if viewModel.isShowingRatingView, let movie = viewModel.selectedMovie {
+                RateView(title: movie.title, selectedStars: $viewModel.rating, noteString: $viewModel.comment, onDismiss: viewModel.cancelRateShowing, onSave: { viewModel.changeRating(movie: movie) })
+                    .transition(.opacity.combined(with: .scale))
+                    .padding()
+            }
         }
     }
     
@@ -116,3 +111,27 @@ private extension MovieListsView {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+//            GeometryReader { geo in
+//                ScrollView(.horizontal, showsIndicators: false) {
+//                    HStack(spacing: 0) {
+//                        ForEach(MovieListsViewModel.Tabs.allCases, id: \.self) { tab in
+//                            ListView(movies: viewModel.films.filter({ movie in
+//                                switch tab {
+//                                case .liked:         movie.status == .liked && movie.genreId != nil
+//                                case .disliked:      movie.status == .disliked && movie.genreId != nil
+//                                case .watched:        movie.status == .viewed && movie.genreId != nil
+//                                }
+//                            }), genres: viewModel.genres)
+//                                .padding(10)
+//                                .frame(width: geo.size.width)
+//                                .id(tab)
+//                                .tag(tab)
+//                        }
+//
+//                    }
+//                    .scrollTargetLayout()
+//                }
+//                .scrollTargetBehavior(.paging)
+//                .scrollPosition(id: createScrollPositionBinding())
+//            }
