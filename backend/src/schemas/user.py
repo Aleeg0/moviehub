@@ -68,3 +68,15 @@ class UpdateUserMovieResponse(BaseSchema):
 class DeleteUserMovieRequest(BaseSchema):
     user_id: int
     movie_id: int
+
+class GetUserMovieServicesRequest(BaseSchema):
+    user_id: int
+
+class GetUserMovieServicesResponse(BaseSchema):
+    movie_ids: list[int]
+
+class UpsertUserMovieServicesBody(BaseSchema):
+    movie_ids: list[int]
+
+class UpsertUserMovieServicesRequest(UpsertUserMovieServicesBody):
+    user_id: int

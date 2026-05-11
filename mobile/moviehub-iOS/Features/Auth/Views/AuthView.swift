@@ -125,7 +125,7 @@ private extension AuthView {
                 }
             }
             
-            AuthActionButton(caption: viewModel.authType.actionButtonCaption) {
+            AuthActionButton(caption: viewModel.authType.actionButtonCaption, style: .authGradient) {
                 hideKeyboard()
                 viewModel.onAuth()
             }

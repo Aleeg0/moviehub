@@ -10,6 +10,8 @@ import Kingfisher
 
 protocol UserListFilmProviderProtocol {
     func fetchUserFilms() async throws -> [MovieListModel]
+    func changeStatus(newStatus: FilmsViewModel.SwipeStatus, movieId: Int, comment: String?, rating: Int?) async throws
+    func deleteMovie(movieId: Int) async throws
 }
 
 final class UserListFilmProvider: UserListFilmProviderProtocol {
@@ -24,6 +26,42 @@ final class UserListFilmProvider: UserListFilmProviderProtocol {
         self.networkManager = networkManager
         self.privateStorage = privateStorage
         self.decoder = decoder
+    }
+    
+    func deleteMovie(movieId: Int) async throws {
+        guard let accessToken: String = privateStorage.fetch(key: "token") else { return  }
+        guard let refreshToken: String = privateStorage.fetch(key: "refreshToken") else { return  }
+        
+        let tokenBody: Data? = decoder.encode(data: RefreshTokensDTO(refreshToken: refreshToken))
+        
+        guard let tokenData = try await networkManager.sendRequest(endpoint: MovieListsEndpoints.refreshTokens, body: tokenBody, authorization: nil) else { return }
+        
+        guard let newTokens: NewTokensDTO = decoder.decode(data: tokenData) else { return }
+        
+        privateStorage.store(key: "token", object: newTokens.accessToken)
+        privateStorage.store(key: "refreshToken", object: newTokens.refreshToken)
+        
+        try await networkManager.sendRequest(endpoint: MovieListsEndpoints.deleteMovie(movieId: movieId), body: nil, authorization: .bearer(token: newTokens.accessToken))
+    }
+    
+    func changeStatus(newStatus: FilmsViewModel.SwipeStatus, movieId: Int, comment: String?, rating: Int?) async throws {
+        
+        guard let accessToken: String = privateStorage.fetch(key: "token") else { return  }
+        guard let refreshToken: String = privateStorage.fetch(key: "refreshToken") else { return  }
+        
+        let tokenBody: Data? = decoder.encode(data: RefreshTokensDTO(refreshToken: refreshToken))
+        
+        guard let tokenData = try await networkManager.sendRequest(endpoint: MovieListsEndpoints.refreshTokens, body: tokenBody, authorization: nil) else { return }
+        
+        guard let newTokens: NewTokensDTO = decoder.decode(data: tokenData) else { return }
+        
+        privateStorage.store(key: "token", object: newTokens.accessToken)
+        privateStorage.store(key: "refreshToken", object: newTokens.refreshToken)
+        
+        let dto = ChangeStatusDTO(status: newStatus, comment: comment, rating: rating)
+        let data = decoder.encode(data: dto)
+        
+        try await networkManager.sendRequest(endpoint: MovieListsEndpoints.changeStatus(movieId: movieId), body: data, authorization: .bearer(token: newTokens.accessToken))
     }
 
     func fetchUserFilms() async throws -> [MovieListModel] {

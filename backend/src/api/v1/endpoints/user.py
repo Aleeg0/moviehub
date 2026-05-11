@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 from starlette import status
 
-from src.schemas import GetUserMoviesStatisticRequest, UpdateUserMovieResponse, UpdateUserMovieRequest
-from src.schemas.user import GetUserMoviesResponse, GetUserMoviesRequest, GetUserMoviesStatisticResponse, \
-    PatchUserMovieRatingBody, DeleteUserMovieRequest
+from src.schemas import GetUserMoviesStatisticRequest, UpdateUserMovieResponse, UpdateUserMovieRequest, \
+    GetUserMoviesResponse, GetUserMoviesRequest, GetUserMoviesStatisticResponse, PatchUserMovieRatingBody, \
+    DeleteUserMovieRequest, GetUserMovieServicesResponse, GetUserMovieServicesRequest, UpsertUserMovieServicesRequest, \
+    UpsertUserMovieServicesBody
 from src.services import UserService
 from src.services.deps import get_user_service
 from ..deps import get_user_id_http
@@ -61,5 +62,37 @@ async def delete_user_movie(
         DeleteUserMovieRequest(
             movie_id=movie_id,
             user_id=user_id
+        )
+    )
+
+@router.get(
+    "/movie-services",
+    response_model=GetUserMovieServicesResponse,
+    status_code=status.HTTP_200_OK
+)
+async def get_user_movie_services(
+    user_id: int = Depends(get_user_id_http),
+    service: UserService = Depends(get_user_service)
+):
+    return await service.get_user_movie_services(
+        GetUserMovieServicesRequest(
+            user_id=user_id,
+        )
+    )
+
+@router.post(
+    "/movie-services",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def upsert_user_movie_services(
+    request: UpsertUserMovieServicesBody,
+    user_id: int = Depends(get_user_id_http),
+    service: UserService = Depends(get_user_service),
+):
+    await service.upsert_user_movie_services(
+        UpsertUserMovieServicesRequest(
+            user_id=user_id,
+            movie_ids=request.movie_ids
         )
     )

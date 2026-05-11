@@ -3,9 +3,10 @@ from fastapi_mail import FastMail
 from redis.asyncio import Redis
 
 from src.core import get_redis, get_mail
-from src.domain.repositories import UnitOfWork, TokenRepository, UserRepository, MovieRepository, UserMovieRepository
+from src.domain.repositories import UnitOfWork, TokenRepository, UserRepository, MovieRepository, UserMovieRepository, \
+    UserMovieServiceRepository
 from src.domain.repositories.deps import get_unit_of_work, get_token_repository, get_user_repository, \
-    get_movie_repository, get_user_movie_repository
+    get_movie_repository, get_user_movie_repository, get_user_movie_service_repository
 from . import AuthService, MailService, MovieService, UserService, PdfService, WSService
 
 
@@ -42,11 +43,13 @@ def get_movie_service(
 
 def get_user_service(
     uow: UnitOfWork = Depends(get_unit_of_work),
-    user_movie_repo: UserMovieRepository = Depends(get_user_movie_repository)
+    user_movie_repo: UserMovieRepository = Depends(get_user_movie_repository),
+    user_movie_service_repo: UserMovieServiceRepository = Depends(get_user_movie_service_repository)
 ) -> UserService:
     return UserService(
         uow=uow,
-        user_movie_repo=user_movie_repo
+        user_movie_repo=user_movie_repo,
+        user_movie_service_repo=user_movie_service_repo
     )
 
 def get_pdf_service() -> PdfService:

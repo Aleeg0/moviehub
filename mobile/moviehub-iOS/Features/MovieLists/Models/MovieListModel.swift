@@ -9,13 +9,16 @@ import Foundation
 
 struct MovieListModel: Hashable, Equatable {
     let id: Int
+    let apiId: Int
     let title: String
     let genreId: Int?
     let posterPath: String
     let releaseDate: Date
     let voteAverage: Double
+    var rating: Int?
+    var comment: String?
     
-    let status: WatchStatus
+    var status: WatchStatus
     
     enum WatchStatus: String, Decodable {
         case liked
@@ -33,6 +36,9 @@ extension MovieListModel {
         self.title = dto.title
         self.voteAverage = dto.voteAverage
         self.status = .init(from: dto.status ?? .liked)
+        self.apiId = dto.apiId
+        self.comment = dto.comment
+        self.rating = dto.rating
     }
 }
 
