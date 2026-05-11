@@ -82,7 +82,7 @@ class AuthService:
 
     async def logout(self, request: LogoutRequest) -> None:
         async with self.uow:
-            await self.token_repo.delete(request.user_id)
+            await self.token_repo.delete_by_user_id(request.user_id)
             await self.uow.commit()
 
 
