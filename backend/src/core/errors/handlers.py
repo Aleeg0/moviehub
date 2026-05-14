@@ -1,0 +1,17 @@
+from starlette import status
+from starlette.responses import JSONResponse
+
+from .errors import ResourceNotFoundError, ResourceAlreadyExistsError, InvalidCredentialsError, UnauthorizedError
+
+
+def not_found_handler(_, ex: ResourceNotFoundError):
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"errorMsg": str(ex)})
+
+def already_exist_handler(_, ex: ResourceAlreadyExistsError):
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,content={"errorMsg": str(ex)})
+
+def invalid_credentials_handler(_, ex: InvalidCredentialsError):
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,content={"errorMsg": str(ex)})
+
+def unauthorized_handler(_, ex: UnauthorizedError):
+    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"errorMsg": str(ex)})

@@ -22,6 +22,30 @@ services:
       retries: 5
       start_period: 10s
 
+  redis:
+    image: redis:7.4-alpine
+    container_name: moviehub-redis
+    command: /usr/local/bin/entrypoint.sh
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+      - ./devops/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./devops/redis/entrypoint.sh:/usr/local/bin/entrypoint.sh
+    restart: unless-stopped
+    networks:
+      - moviehub-network
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   moviehub-core:
     build:
       context: ./backend
@@ -39,7 +63,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/check" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:${MOVIEHUB_CORE}/health/check" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -47,6 +71,7 @@ services:
 
 volumes:
   database_data:
+  redis_data:
 
 networks:
   moviehub-network:

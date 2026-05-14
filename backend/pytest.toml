@@ -1,0 +1,8 @@
+[pytest]
+minversion = "9.0"
+asyncio_mode = "auto"
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = ["--maxfail=5","-v","-s"]
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
