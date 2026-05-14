@@ -277,7 +277,7 @@ final class AuthViewModel: ObservableObject {
                     }
                 } catch let error {
                     await MainActor.run {
-                        self.authError = error as? AuthServiceError ?? AuthServiceError.loginError(.unknown(message: "Login error occured"))
+                        self.authError = error as? AuthServiceError ?? AuthServiceError.loginError(.unknown(message: "Ошибка входа"))
                     }
                 }
             }
@@ -304,7 +304,7 @@ final class AuthViewModel: ObservableObject {
                     }
                 } catch let error {
                     await MainActor.run {
-                        self.authError = error as? AuthServiceError ?? AuthServiceError.registerError(.unknown(message: "Register error occured"))
+                        self.authError = error as? AuthServiceError ?? AuthServiceError.registerError(.unknown(message: "Ошибка регистрации"))
                     }
                 }
             }
@@ -339,15 +339,15 @@ extension AuthViewModel {
         
         var typePickerCaption: LocalizedStringResource {
             switch self {
-            case .login:             "Login"
-            case .register:          "Register"
+            case .login:             "Вход"
+            case .register:          "Регистрация"
             }
         }
         
         var actionButtonCaption: LocalizedStringResource {
             switch self {
-            case .login:           "Login"
-            case .register:        "Register"
+            case .login:           "Войти"
+            case .register:        "Зарегистрироваться"
             }
         }
     }
@@ -362,19 +362,19 @@ enum FieldType {
     
     var caption: LocalizedStringResource {
         switch self {
-        case .name:                 "Name"
-        case .email:                "Email"
-        case .password:             "Password"
-        case .confirmPassword:      "Confirm Password"
+        case .name:                 "Имя"
+        case .email:                "Почта"
+        case .password:             "Пароль"
+        case .confirmPassword:      "Подтверждение пароля"
         }
     }
     
     var prompt: LocalizedStringResource {
         switch self {
-        case .name:                "Your Name"
-        case .email:               "Your Email"
-        case .password:            "Your Password"
-        case .confirmPassword:     "Confirm Your Password"
+        case .name:                "Ваше Имя"
+        case .email:               "Ваша Почта"
+        case .password:            "Ваш Пароль"
+        case .confirmPassword:     "Подтверждение Пароля"
         }
     }
     

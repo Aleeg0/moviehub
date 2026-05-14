@@ -133,10 +133,10 @@ private extension AuthView {
         }
         .padding(20)
         .background {
-            RoundedRectangle(cornerRadius: 26)
+            RoundedRectangle(cornerRadius: 35)
                 .fill(.inputSectionGray)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 26)
+                    RoundedRectangle(cornerRadius: 35)
                         .stroke(Color.blue, lineWidth: 1)
                 )
         }
@@ -161,7 +161,7 @@ private extension AuthView {
                     }
             }
             
-            Text("I agree to the [Terms and Privacy Policy](http://localhost:8000/api/v1/users/agreement).")
+            Text("Я принимаю условия [Политики конфиденциальности](http://localhost:8000/api/v1/auth/agreement).")
                 .font(.system(size: 15, weight: .regular))
                 .tint(.blue)
                 .fixedSize(horizontal: false, vertical: true)
@@ -180,7 +180,7 @@ private extension AuthView {
             hideKeyboard()
             viewModel.forgotPassword()
         } label: {
-            Text("Forgot Password?")
+            Text("Забыли пароль?")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(.authGradient)
                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -235,7 +235,7 @@ private extension AuthView {
             hideKeyboard()
             viewModel.changeAuthType()
         } label: {
-            Text(type.actionButtonCaption)
+            Text(type.typePickerCaption)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(type == viewModel.authType ? .white : .gray)
                 .padding(12)
@@ -263,10 +263,10 @@ private extension AuthView {
                         .foregroundStyle(.authGradient)
                 )
             
-            Text("MovieMatch")
+            Text("MovieHub")
                 .font(.system(size: 29, weight: .semibold))
             
-            Text("Discover a film that will dwell in your heart forever.")
+            Text("Найдите для себя фильм, который навсегда останется в вашем сердце.")
                 .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(.gray)
                 .multilineTextAlignment(.center)

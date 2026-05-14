@@ -18,6 +18,7 @@ final class FilmsViewModel: ObservableObject {
     @Published var isShowingRateView = false
     @Published var noteString: String = ""
     @Published var userProviders: Set<Int>?
+    @Published var viewState: ViewState = .loading
     
     private let filmsProvider: IFilmsProvider
     private let swipeService: SwipeServiceProtocol
@@ -116,6 +117,9 @@ final class FilmsViewModel: ObservableObject {
             await MainActor.run {
                 self.films += films
                 self.page = Int.random(in: 1...20)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.viewState = .success
+                }
             }
         }
     }

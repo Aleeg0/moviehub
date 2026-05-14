@@ -47,7 +47,7 @@ private extension ForgotPasswordView {
     
     var successView: some View {
         VStack(spacing: 25) {
-            Text("You have changed password successfully")
+            Text("Пароль успешно изменен")
                 .font(.system(size: 24, weight: .semibold))
                 .multilineTextAlignment(.center)
             
@@ -65,21 +65,21 @@ private extension ForgotPasswordView {
     
     var enterNewPasswordView: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text("Password")
+            Text("Пароль")
                 .font(.system(size: 26, weight: .medium))
             
-            Text("Enter new password")
+            Text("Введите новый пароль")
                 .font(.system(size: 18, weight: .medium))
             
             VStack(spacing: 15) {
                 
                 textField(inputType: .password, errors: viewModel.resetPasswordValidationError as! [AuthValidationError]) {
-                    SecureField("", text: $viewModel.newPassword, prompt: Text("Enter Your New Password").font(.system(size: 20, weight: .semibold)))
+                    SecureField("", text: $viewModel.newPassword, prompt: Text("Введите новый пароль").font(.system(size: 20, weight: .semibold)))
                         .keyboardType(.default)
                 }
                 
                 textField(inputType: .confirmPassword, errors: viewModel.resetPasswordValidationError as! [AuthValidationError]) {
-                    SecureField("", text: $viewModel.confirmNewPassword, prompt: Text("Confirm Your New Password").font(.system(size: 20, weight: .semibold)))
+                    SecureField("", text: $viewModel.confirmNewPassword, prompt: Text("Подтвердите новый пароль").font(.system(size: 20, weight: .semibold)))
                         .keyboardType(.default)
                 }
                 
@@ -92,7 +92,7 @@ private extension ForgotPasswordView {
             .animation(.bouncy, value: viewModel.resetPasswordError)
             .animation(.bouncy, value: viewModel.resetPasswordValidationError as! [AuthValidationError])
             
-            AuthActionButton(caption: "Change password", style: .authGradient, action: viewModel.resetPassword)
+            AuthActionButton(caption: "Изменить пароль", style: .authGradient, action: viewModel.resetPassword)
             
         }
     }
@@ -102,10 +102,10 @@ private extension ForgotPasswordView {
     var enterCodeView: some View {
         VStack(alignment: .leading, spacing: 15) {
             
-            Text("Verification")
+            Text("Верификация")
                 .font(.system(size: 26, weight: .medium))
             
-            Text("Enter the 5-digit code.")
+            Text("Введите 5-значный код.")
                 .font(.system(size: 18, weight: .medium))
             
             TextField("", text: $viewModel.resetCode)
@@ -133,7 +133,7 @@ private extension ForgotPasswordView {
     
     var resendCodeButton: some View {
         Button(action: viewModel.resendCode) {
-            Text("Resend Code \(viewModel.getRemainingTime)")
+            Text("Отправить заново \(viewModel.getRemainingTime)")
                 .foregroundStyle(viewModel.remainingTime > 0 ? .gray : .authBlueTop)
                 .font(.system(size: 15, weight: .semibold))
                 .disabled(viewModel.remainingTime > 0)
@@ -204,10 +204,10 @@ private extension ForgotPasswordView {
         VStack(alignment: .leading, spacing: 25) {
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Reset password")
+                Text("Сбросить пароль")
                     .font(.system(size: 26, weight: .medium))
                 
-                Text("Enter your email.")
+                Text("Введите почту.")
                     .font(.system(size: 18, weight: .medium))
             }
             
@@ -227,7 +227,7 @@ private extension ForgotPasswordView {
                 }
             }
                 
-            AuthActionButton(caption: "Send code", style: .authGradient) {
+            AuthActionButton(caption: "Отправить код", style: .authGradient) {
                 viewModel.onOTPSend()
                 if viewModel.emailForResetError == nil {
                     hideKeyboard()
@@ -279,7 +279,7 @@ private extension ForgotPasswordView {
             }
             .frame(height: 150)
             
-            Text("Sending Verification Code")
+            Text("Отправка Кода Верификации")
                 .font(.title3)
                 .fontWeight(.semibold)
         }

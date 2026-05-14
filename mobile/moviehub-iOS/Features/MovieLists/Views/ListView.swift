@@ -65,15 +65,15 @@ private extension ListView {
         var title: LocalizedStringResource {
             switch self {
             case .delete:
-                return "Delete"
+                return "Удалить"
             case .toLikes:
-                return "Add to Likes"
+                return "Нравится"
             case .toViewed:
-                return "Add to Viewed"
+                return "Смотрел"
             case .toDislikes:
-                return "Add to Dislikes"
+                return "Не нравится"
             case .rate:
-                return "Rate a film"
+                return "Оценить"
             }
         }
         

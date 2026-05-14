@@ -32,6 +32,7 @@ struct ProvidersView: View {
                 }
             }
             .ignoresSafeArea(edges: .bottom)
+            .animation(.bouncy, value: viewModel.visibleProviders)
         }
         .overlay(alignment: .bottom) {
             AuthActionButton(caption: "Сохранить", style: .purpleGradient, action: viewModel.uploadProviders)

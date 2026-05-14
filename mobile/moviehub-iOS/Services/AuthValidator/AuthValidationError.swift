@@ -36,11 +36,11 @@ enum AuthValidationError: IAuthValidationError, Equatable {
         var description: LocalizedStringResource {
             switch self {
             case .tooShort:
-                "Name is too short"
+                "Имя слишком короткое"
             case .tooLong:
-                "Name is too long"
+                "Имя слишком длинное"
             case .empty:
-                "Name is empty"
+                "Пустое имя"
             }
         }
     
@@ -53,9 +53,9 @@ enum AuthValidationError: IAuthValidationError, Equatable {
         var description: LocalizedStringResource {
             switch self {
             case .formatError:
-                "Not correct email"
+                "Некорректная почта"
             case .empty:
-                "Email is empty"
+                "Пустая почта"
             }
         }
     }
@@ -69,13 +69,13 @@ enum AuthValidationError: IAuthValidationError, Equatable {
         var description: LocalizedStringResource {
             switch self {
             case .tooShort:
-                "Password is too short"
+                "Слишком короткий пароль"
             case .tooLong:
-                "Password is too long"
+                "Слишком длинный пароль"
             case .passwordMismatch:
-                "Passwords are not equal"
+                "Пароли не совпали"
             case .empty:
-                "Password is empty"
+                "Пустой пароль"
             }
         }
     }

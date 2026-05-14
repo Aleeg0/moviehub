@@ -9,6 +9,7 @@ import Foundation
 
 protocol ProfileServiceProtocol {
     func updateStats() async throws -> StatsModel
+    func getProfileInfo() -> ProfileInfoModel
 }
 
 final class ProfileService: ProfileServiceProtocol {
@@ -21,6 +22,12 @@ final class ProfileService: ProfileServiceProtocol {
         self.networkManager = networkManager
         self.privateStorage = privateStorage
         self.decoder = decoder
+    }
+    
+    func getProfileInfo() -> ProfileInfoModel {
+        let name: String? = privateStorage.fetch(key: "name")
+        let email: String? = privateStorage.fetch(key: "email")
+        return .init(name: name, email: email)
     }
     
     func updateStats() async throws -> StatsModel {
