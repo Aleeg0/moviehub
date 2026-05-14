@@ -19,6 +19,7 @@ protocol IAuthService {
     func saveUserInfo(userModel: UserModel)
     func fetchUserInfo() -> UserModel?
     func removeUserInfo()
+    func getNewAccess() async throws
 }
 
 final class AuthService: IAuthService {
@@ -37,6 +38,22 @@ final class AuthService: IAuthService {
         self.decoder = decoder
         self.privateStorage = privateStorage
     }
+    
+    func getNewAccess() async throws {
+        guard let accessToken: String = privateStorage.fetch(key: "token") else { return }
+        guard let refreshToken: String = privateStorage.fetch(key: "refreshToken") else { return }
+        
+        let tokenBody: Data? = decoder.encode(data: RefreshTokensDTO(refreshToken: refreshToken))
+        
+        guard let tokenData = try await networkManager.sendRequest(endpoint: MovieListsEndpoints.refreshTokens, body: tokenBody, authorization: nil) else { return }
+        
+        guard let newTokens: NewTokensDTO = decoder.decode(data: tokenData) else { return }
+        
+        privateStorage.store(key: "token", object: newTokens.accessToken)
+        privateStorage.store(key: "refreshToken", object: newTokens.refreshToken)
+    }
+    
+    
     
     func resetPassword(email: String, password: String) async throws(AuthServiceError) {
         
@@ -127,6 +144,8 @@ final class AuthService: IAuthService {
         if let response: AuthResponseDTO = decoder.decode(data: data) {
             privateStorage.store(key: privateStorageTokenKey, object: response.accessToken)
             privateStorage.store(key: refreshTokenKey, object: response.refreshToken)
+            privateStorage.store(key: "name", object: response.name)
+            privateStorage.store(key: "email", object: response.email)
         }
         else if let error: ErrorAuthResponseDTO = decoder.decode(data: data) {
             throw .loginError(.unknown(message: "\(error.detail.first?.msg ?? "Error")"))
@@ -154,6 +173,8 @@ final class AuthService: IAuthService {
         if let response: AuthResponseDTO = decoder.decode(data: data) {
             privateStorage.store(key: privateStorageTokenKey, object: response.accessToken)
             privateStorage.store(key: refreshTokenKey, object: response.refreshToken)
+            privateStorage.store(key: "name", object: model.name)
+            privateStorage.store(key: "email", object: model.email)
         }
         else if let error: ErrorAuthResponseDTO = decoder.decode(data: data) {
             throw .registerError(.unknown(message: "\(error.detail.first?.msg ?? "Error")"))

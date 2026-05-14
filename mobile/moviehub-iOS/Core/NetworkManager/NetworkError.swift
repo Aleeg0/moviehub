@@ -15,9 +15,9 @@ enum NetworkError: Error {
     var description: LocalizedStringResource {
         switch self {
         case .serverError(let statusCode):
-            "Server error code \(statusCode)"
+            "Ошибка сервера: \(statusCode)"
         case .networkError(let error):
-            "Error: \(error.localizedDescription)"
+            "Ошибка: \(error.localizedDescription)"
         case .unknown(let message):
             message
         }

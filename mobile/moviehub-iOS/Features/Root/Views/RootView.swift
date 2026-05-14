@@ -11,12 +11,13 @@ struct RootView: View {
     let networkManager = NetworkManager()
     let decoder = DecodeManager()
     let privateStorage = UserDefaultsStorageManager()
-    
+    let authService: IAuthService
     
     @ObservedObject private var viewModel: RootViewModel
     
     init(viewModel: RootViewModel) {
         self.viewModel = viewModel
+        self.authService = AuthService(networkManager: networkManager, decoder: decoder, privateStorage: privateStorage)
     }
     
     var body: some View {

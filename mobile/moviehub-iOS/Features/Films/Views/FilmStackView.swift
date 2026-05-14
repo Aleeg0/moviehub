@@ -17,6 +17,27 @@ struct FilmStackView: View {
         ), swipeService: SwipeService(dependency: .init(networkManager: NetworkManager(), privateStorage: UserDefaultsStorageManager(), decoder: DecodeManager())), providerService: ProvidersService(networkManager: NetworkManager(), decoder: DecodeManager(), privateManager: UserDefaultsStorageManager()))
 
     var body: some View {
+        ZStack {
+            if viewModel.viewState == .loading {
+                loadingView
+                    .transition(.scale)
+            } else {
+                stackView
+                    .transition(.scale)
+            }
+        }
+        .navigationTitle("Главная")
+        .navigationBarTitleDisplayMode(.inline)
+        .animation(.bouncy, value: viewModel.viewState)
+        .onAppear {
+            viewModel.fetchUsersProviders()
+        }
+    }
+    
+}
+
+private extension FilmStackView {
+    var stackView: some View {
         VStack(spacing: 40) {
             ZStack {
                 
@@ -60,12 +81,46 @@ struct FilmStackView: View {
                 RateView(title: viewModel.visibleFilms.first?.title ?? "No title", selectedStars: $viewModel.selectedStarsCount, noteString: $viewModel.noteString, onDismiss: viewModel.onDismiss , onSave: viewModel.sendViewedMovie)
             }
         }
-        .onAppear {
-            viewModel.fetchUsersProviders()
+    }
+}
+
+private extension FilmStackView {
+    var loadingView: some View {
+        VStack(spacing: 12) {
+            PhaseAnimator(LoadingStages.allCases) { stage in
+                Image(systemName: stage.symbol)
+                    .font(.system(size: 100))
+                    .contentTransition(.symbolEffect)
+                    .frame(width: 150, height: 150)
+            } animation: { _ in
+                    .linear(duration: 0.8)
+            }
+            .frame(height: 150)
+            
+            Text("Идет загрузка данных...")
+                .font(.title3)
+                .fontWeight(.semibold)
         }
     }
     
+    enum LoadingStages: CaseIterable {
+        case iphone
+        case bubble
+        case plane
+        
+        var symbol: String {
+            switch self {
+            case .iphone:
+                "iphone"
+            case .bubble:
+                "ellipsis.message.fill"
+            case .plane:
+                "paperplane.fill"
+            }
+        }
+    }
 }
+
 
 private extension FilmStackView {
     func actionButton(type: FilmsViewModel.ActionButton) -> some View {

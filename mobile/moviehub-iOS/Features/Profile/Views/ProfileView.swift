@@ -124,22 +124,22 @@ struct ProfileView: View {
                     Text("\(viewModel.stats.viewed)")
                         .font(.system(size: 25, weight: .semibold))
                 }
-                
+        
                 statisticsView(caption: "Хочу") {
                     Text("\(viewModel.stats.liked)")
                         .font(.system(size: 25, weight: .semibold))
                 }
                 
-                statisticsView(caption: "Средняя") {
-                    HStack(spacing: 5) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 27))
-                            .foregroundStyle(.yellow)
-                        
-                        Text("8.6")
-                            .font(.system(size: 25, weight: .semibold))
-                    }
-                }
+//                statisticsView(caption: "Средняя") {
+//                    HStack(spacing: 5) {
+//                        Image(systemName: "star.fill")
+//                            .font(.system(size: 27))
+//                            .foregroundStyle(.yellow)
+//                        
+//                        Text("8.6")
+//                            .font(.system(size: 25, weight: .semibold))
+//                    }
+//                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -155,7 +155,7 @@ struct ProfileView: View {
             content()
             
             Text(caption)
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity)
@@ -171,10 +171,10 @@ struct ProfileView: View {
             avatarView
             
             VStack(alignment: .leading, spacing: 10) {
-                Text(viewModel.userModel?.name ?? "playerz0redd")
+                Text(viewModel.profileInfo.name ?? "playerz0redd")
                     .font(.system(size: 25, weight: .semibold))
                 
-                Text(viewModel.userModel?.email ?? "ipasha1337@yandex.by")
+                Text(viewModel.profileInfo.email ?? "ipasha1337@yandex.by")
                     .font(.system(size: 19, weight: .regular))
                     .foregroundStyle(.gray)
             }

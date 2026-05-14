@@ -16,6 +16,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var stats: StatsModel = .init()
     @Published var isShowingProviderPicker = false
     @Published var userProviders: Set<Int> = []
+    @Published var profileInfo: ProfileInfoModel
     
     // MARK: - Services
     private let authService: IAuthService
@@ -29,6 +30,7 @@ final class ProfileViewModel: ObservableObject {
         self.profileService = profileService
         self.providerService = providerService
         self.onExit = onExit
+        self.profileInfo = profileService.getProfileInfo()
         fetchUsersProviders()
         
         self.userModel = authService.fetchUserInfo()
@@ -62,10 +64,10 @@ final class ProfileViewModel: ObservableObject {
     }
     
     var nameFirstLetter: String {
-        if let name = userModel?.name, let letter = name.first {
+        if let name = profileInfo.name, let letter = name.first {
             return String(letter)
         }
-        return "1"
+        return "P"
     }
     
     

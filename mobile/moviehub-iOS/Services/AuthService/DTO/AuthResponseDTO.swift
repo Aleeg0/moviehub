@@ -10,6 +10,8 @@ import Foundation
 struct AuthResponseDTO: Decodable {
     let accessToken: String
     let refreshToken: String
+    let name: String?
+    let email: String?
 }
 
 struct ErrorAuthResponseDTO: Decodable {

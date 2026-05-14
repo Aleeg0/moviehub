@@ -47,7 +47,7 @@ extension Tabs {
         case .profile:
             ProfileFlowView(onExit: onExit)
         case .main:
-            FilmStackView()
+            MainScreenFlowView()
         case .lists:
             MovieListFlowView()
         }

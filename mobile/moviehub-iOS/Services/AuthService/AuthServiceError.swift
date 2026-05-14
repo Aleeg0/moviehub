@@ -26,7 +26,7 @@ enum AuthServiceError: Error, Equatable {
         case .loginError(let networkError):
             switch networkError {
             case .serverError(let statusCode):
-                statusCode == 400 ? "User not found" : networkError.description
+                statusCode == 400 ? "Пользователь не найден" : networkError.description
             case .networkError:
                 networkError.description
             case .unknown:
@@ -35,18 +35,18 @@ enum AuthServiceError: Error, Equatable {
         case .registerError(let networkError):
             switch networkError {
             case .serverError(let statusCode):
-                statusCode == 400 ? "User already exists" : networkError.description
+                statusCode == 400 ? "Пользователь уже существует" : networkError.description
             case .networkError:
                 networkError.description
             case .unknown:
                 networkError.description
             }
         case .unknown:
-            "Unknown error occured"
+            "Неизвестная ошибка :("
         case .resetPasswordError(let networkError):
             switch networkError {
             case .serverError(let statusCode):
-                statusCode == 404 ? "User not found" : networkError.description
+                statusCode == 404 ? "Пользователь не найден" : networkError.description
             case .networkError:
                 networkError.description
             case .unknown:
