@@ -8,15 +8,15 @@ from src.domain.models import UserMovieService
 
 class UserMovieServiceRepository:
     def __init__(self, session: AsyncSession):
-        self.session = session
+        self._session = session
 
-    async def get_user_movie_services_by_id(self, user_id: int) -> list[UserMovieService]:
+    async def get_by_user_id(self, user_id: int) -> list[UserMovieService]:
         stmt = select(UserMovieService).where(UserMovieService.user_id == user_id)
-        result = await self.session.scalars(stmt)
+        result = await self._session.scalars(stmt)
         return cast(list[UserMovieService], result.all())
 
-    async def upsert_user_movie_services(self, user_id: int, movie_service_ids: list[int]) -> None:
-        current_user_movie_services = await self.get_user_movie_services_by_id(user_id)
+    async def upsert(self, user_id: int, movie_service_ids: list[int]) -> None:
+        current_user_movie_services = await self.get_by_user_id(user_id)
 
         stmt = (
             delete(UserMovieService)
@@ -25,7 +25,7 @@ class UserMovieServiceRepository:
                 UserMovieService.movie_service_id.notin_(movie_service_ids)
             )
         )
-        await self.session.execute(stmt)
+        await self._session.execute(stmt)
         to_add_ids = set(movie_service_ids) - {
             user_movie_service.movie_service_id for user_movie_service in current_user_movie_services
         }
@@ -36,5 +36,5 @@ class UserMovieServiceRepository:
             )
             for movie_service_id in to_add_ids
         ]
-        self.session.add_all(new_user_movie_services)
-        await self.session.flush()
+        self._session.add_all(new_user_movie_services)
+        await self._session.flush()

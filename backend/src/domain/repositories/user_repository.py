@@ -1,6 +1,8 @@
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.errors import ResourceAlreadyExistsError
 from src.domain.models import User
 
 
@@ -14,9 +16,12 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     async def create(self, user: User) -> User:
-        self._session.add(user)
-        await self._session.flush()
-        await self._session.refresh(user)
+        try:
+            self._session.add(user)
+            await self._session.flush()
+            await self._session.refresh(user)
+        except IntegrityError as e:
+            raise ResourceAlreadyExistsError(f"{User.__name__} already exists") from e
         return user
 
     async def update_password(self, email: str, new_password: str) -> None:

@@ -92,12 +92,12 @@ class UserService:
             await self.uow.commit()
 
     async def get_user_movie_services(self, request: GetUserMovieServicesRequest) -> GetUserMovieServicesResponse:
-        user_movie_services = await self.user_movie_service_repo.get_user_movie_services_by_id(request.user_id)
+        user_movie_services = await self.user_movie_service_repo.get_by_user_id(request.user_id)
         return GetUserMovieServicesResponse(
             movie_ids=[user_movie_service.movie_service_id for user_movie_service in user_movie_services]
         )
 
     async def upsert_user_movie_services(self, request: UpsertUserMovieServicesRequest) -> None:
         async with self.uow:
-            await self.user_movie_service_repo.upsert_user_movie_services(request.user_id, request.movie_ids)
+            await self.user_movie_service_repo.upsert(request.user_id, request.movie_ids)
             await self.uow.commit()

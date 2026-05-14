@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +10,7 @@ class MovieRepository:
         self._session = session
 
     async def upsert(self, movie_dict: dict) -> Movie:
-        smtp = insert(Movie).values(
+        stmt = insert(Movie).values(
             **movie_dict
         ).on_conflict_do_update(
             index_elements=["external_id"],
@@ -18,4 +19,14 @@ class MovieRepository:
             }
         ).returning(Movie)
 
-        return await self._session.scalar(smtp)
+        result = await self._session.scalar(stmt)
+        await self._session.refresh(result)
+        return result
+
+    async def get_by_id(self, movie_id: int) -> Movie | None:
+        stmt = (
+            select(Movie)
+            .where(Movie.id == movie_id)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
